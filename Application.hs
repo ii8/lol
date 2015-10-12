@@ -28,6 +28,9 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
 import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
                                              toLogStr)
 
+import qualified Network.Wai as Wai
+import qualified Data.ByteString.Char8 as C
+
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
 import Handler.Common
@@ -75,6 +78,11 @@ makeFoundation appSettings = do
     -- Return the foundation
     return $ mkFoundation pool
 
+urlWare :: Wai.Middleware
+urlWare a r = a r{ Wai.queryString = ("domain" :: ByteString, domain) : Wai.queryString r }
+  where
+    domain = liftM (C.takeWhile (/= ':')) $ lookup "host" . Wai.requestHeaders $ r
+
 -- | Convert our foundation to a WAI Application by calling @toWaiAppPlain@ and
 -- applying some additional middlewares.
 makeApplication :: App -> IO Application
@@ -92,7 +100,7 @@ makeApplication foundation = do
 
     -- Create the WAI application and apply middlewares
     appPlain <- toWaiAppPlain foundation
-    return $ logWare $ defaultMiddlewaresNoLogging appPlain
+    return $ urlWare $ logWare $ defaultMiddlewaresNoLogging appPlain
 
 -- | Warp settings for the given foundation value.
 warpSettings :: App -> Settings

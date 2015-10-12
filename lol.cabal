@@ -82,6 +82,7 @@ library
                  , containers
                  , vector
                  , time
+                 , wai
 
 executable         lol
     if flag(library-only)

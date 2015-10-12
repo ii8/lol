@@ -1,3 +1,6 @@
+Deployment
+    domain Text
+    UniqueDomain domain
 User
     ident Text
     password Text Maybe
