@@ -1,5 +1,10 @@
 <h1>Welcome to Yesod!
 
+$maybe domain <- domainName
+  <h2>Deployment: #{domain}
+$nothing
+  <h2>No Deployment
+
 <ol>
   <li>Now that you have a working project you should use the #
     \<a href="http://www.yesodweb.com/book/">Yesod book<span class="glyphicon glyphicon-book"></span></a> to learn more. #

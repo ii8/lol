@@ -18,6 +18,7 @@ getHomeR = do
         handlerName = "getHomeR" :: Text
     defaultLayout $ do
         aDomId <- newIdent
+        domainName <- runInputGet $ iopt textField "domain"
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
@@ -31,6 +32,7 @@ postHomeR = do
 
     defaultLayout $ do
         aDomId <- newIdent
+        domainName <- runInputGet $ iopt textField "domain"
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
