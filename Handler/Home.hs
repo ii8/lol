@@ -20,7 +20,7 @@ getHomeR = do
         aDomId <- newIdent
         domainName <- runInputGet $ iopt textField "domain"
         setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+        $(widgetFile "default/homepage")
 
 postHomeR :: Handler Html
 postHomeR = do
@@ -34,7 +34,7 @@ postHomeR = do
         aDomId <- newIdent
         domainName <- runInputGet $ iopt textField "domain"
         setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+        $(widgetFile "default/homepage")
 
 sampleForm :: Form (FileInfo, Text)
 sampleForm = renderBootstrap3 BootstrapBasicForm $ (,)

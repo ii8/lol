@@ -1,0 +1,59 @@
+@import url(https://fonts.googleapis.com/css?family=SC|Playfair+Display);
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px
+}
+h2##{aDomId} {
+    color: #990
+}
+li {
+    line-height: 2em;
+    font-size: 16px
+}
+ol {
+    margin-bottom: 30px
+}
+footer {
+    text-align: center
+}
+.input-sm {
+    margin-left: 20px
+}
+
+header {
+  background: url(@{StaticR deployments_default_img_greybg_png});
+  position: absolute;
+  width: 100%;
+  color: #fff;
+}
+header .logo { font-family: 'Playfair Display', serif; text-align: left; font-size: 40px; font-weight: bold; }
+header ul { list-style-type: none; margin: 0; padding: 0; text-align: right; margin-top: 20px; }
+header ul li { display: inline-block; }
+header ul li a { text-decotraion: none; color: #fff; display: block; padding: 10px 20px 10px 20px; }
+header ul li a:hover { background: #fff; color: #363636; text-decoration: none; }
+
+.main-header {
+  padding-top: 300px;
+  padding-bottom: 200px;
+  color: #fff;
+  width: 100%;
+  background: url(@{StaticR deployments_default_img_mainbanner_jpg});
+  text-align: center;
+}
+.main-header h1 { font-family: 'Playfair Display', serif; font-weight: bold; font-size: 50px; color: #fff}
+.main-header a {
+  display: inline-block;
+  padding: 10px 20px 10px 20px;
+  text-decoration: none;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 20px;
+
+}
+.main-header a:hover {
+  background: #fff;
+  color: #363636;
+}
