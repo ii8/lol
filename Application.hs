@@ -34,7 +34,7 @@ import qualified Data.ByteString.Char8 as C
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
 import Handler.Common
-import Handler.Home
+import Handler.Custom
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
@@ -81,7 +81,7 @@ makeFoundation appSettings = do
 urlWare :: Wai.Middleware
 urlWare a r = a r{ Wai.queryString = ("domain" :: ByteString, domain) : Wai.queryString r }
   where
-    domain = liftM (C.takeWhile (/= ':')) $ lookup "host" . Wai.requestHeaders $ r
+    domain = C.takeWhile (/= ':') <$> (lookup "host" . Wai.requestHeaders $ r)
 
 -- | Convert our foundation to a WAI Application by calling @toWaiAppPlain@ and
 -- applying some additional middlewares.
