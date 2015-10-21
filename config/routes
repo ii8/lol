@@ -4,5 +4,7 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
+/menu MenuR GET
+
 / HomeR GET
 !/#Text CustomR GET
