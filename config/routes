@@ -5,6 +5,7 @@
 /robots.txt RobotsR GET
 
 /menu MenuR GET
+/order OrderR GET POST
 
 / HomeR GET
 !/#Text CustomR GET

@@ -1,0 +1,5 @@
+
+window.onload=function()
+{
+    order_inc(1);
+}

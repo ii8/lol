@@ -17,12 +17,14 @@ library
                      Foundation
                      Import
                      Import.Base
+                     Import.Cookie
                      Model
                      Settings
                      Settings.StaticFiles
                      Handler.Common
                      Handler.Custom
                      Handler.Menu
+                     Handler.Order
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -84,6 +86,7 @@ library
                  , vector
                  , time
                  , wai
+                 , attoparsec
 
 executable         lol
     if flag(library-only)

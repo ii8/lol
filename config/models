@@ -6,7 +6,6 @@ Deployment
 Page
     deployment DeploymentId
     name Text
-    heading Text
     template Text
     UniquePage deployment name
 PageData

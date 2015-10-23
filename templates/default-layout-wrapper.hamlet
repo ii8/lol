@@ -30,8 +30,8 @@ $newline never
         <div class="col-md-8">
           <nav>
             <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/menu">Menu</a></li>
+              <li><a href="@{HomeR}">Home</a></li>
+              <li><a href="@{MenuR}">Menu</a></li>
               <li><a href="">Log In</a></li>
 
     ^{pageBody pc}
