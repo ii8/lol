@@ -51,11 +51,16 @@ header ul li a:hover { background: #fff; color: #363636; text-decoration: none; 
   color: #fff;
   font-weight: bold;
   font-size: 20px;
+  background-size: 100% 200%;
+  background-image: -webkit-linear-gradient(bottom, rgb(255,255,255) 50%,rgba(230,160,21,0) 50%);
+  -webkit-transition: all 0.25s;
+  -moz-transition: all 0.25s;
+  transition: all 0.25s;
 
 }
 .main-header a:hover {
-  background: #fff;
   color: #363636;
+  background-position: 0 100%;
 }
 
 .begin-template{ padding-top: 100px; }
