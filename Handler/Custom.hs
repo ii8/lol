@@ -3,20 +3,12 @@ module Handler.Custom (getHomeR, getCustomR) where
 
 import Import
 
-runHandler :: Text -> Key Page -> Handler Html
-runHandler "default" page = do
-    defaultLayout $ do
-        domainName <- runInputGet $ ireq textField "domain"
-        setTitle "Default"
-        $(widgetFile "default/homepage")
-runHandler _ _ = notFound
-
 getCustomR :: Text -> Handler Html
-getCustomR page = do
+getCustomR name = do
     domain <- runInputGet $ ireq textField "domain"
     (Entity deployment _) <- runDB $ getBy404 $ UniqueDomain domain
-    (Entity pageId (Page _ _ template)) <- runDB $ getBy404 $ UniquePage deployment page
-    runHandler template pageId
+    (Entity _ (Page _ _ piece)) <- runDB $ getBy404 $ UniquePage deployment name
+    defaultLayout $ setTitle (toHtml name) >> renderPiece piece
 
 getHomeR :: Handler Html
 getHomeR = getCustomR "home"

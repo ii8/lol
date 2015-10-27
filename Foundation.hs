@@ -3,7 +3,6 @@ module Foundation where
 import Import.Base
 import Model
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
-import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
 import Yesod.Auth.BrowserId (authBrowserId)
 import Yesod.Auth.Message   (AuthMessage (InvalidLogin))
@@ -42,6 +41,10 @@ mkYesodData "App" $(parseRoutesFile "config/routes")
 -- | A convenient synonym for creating forms.
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
+wrap :: Widget -> Text -> Widget
+wrap w "navbar" = $(widgetFile "wrappers/navbar")
+wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
+
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
@@ -56,9 +59,8 @@ instance Yesod App where
         "config/client_session_key.aes"
 
     defaultLayout widget = do
-        master <- getYesod
-        mmsg <- getMessage
-
+        domain <- runInputGet $ ireq textField "domain"
+        (Entity _ (Deployment _ _ wrapper)) <- runDB $ getBy404 $ UniqueDomain domain
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
         -- default-layout-wrapper is the entire page. Since the final
@@ -69,8 +71,18 @@ instance Yesod App where
             addStylesheet $ StaticR css_bootstrap_css
             addStylesheet $ StaticR css_base_css
             addScript $ StaticR js_order_js
-            $(widgetFile "default-layout")
-        withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
+            wrap widget wrapper
+        withUrlRenderer [hamlet|
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>#{pageTitle pc}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    ^{pageHead pc}
+  <body>
+    ^{pageBody pc}
+|]
 
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR

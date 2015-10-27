@@ -10,6 +10,7 @@ getOrderR = do
     let derp = parseOrder =<< cookie
     let lolvar = liftM renderOrder derp
     defaultLayout $ do
+        setTitle "Order"
         $(widgetFile "order")
 
 postOrderR :: Handler Html

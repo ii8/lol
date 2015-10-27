@@ -1,15 +1,18 @@
 Deployment
     name Text
     domain Text
+    wrapper Text
     UniqueDeployment name
     UniqueDomain domain
 Page
     deployment DeploymentId
     name Text
-    template Text
+    piece PieceId
     UniquePage deployment name
-PageData
-    page PageId
+Piece
+    name Text
+PieceData
+    piece PieceId
     key Text
     value Text
 User

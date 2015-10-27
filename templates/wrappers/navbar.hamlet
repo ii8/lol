@@ -1,0 +1,10 @@
+<header>
+  <div class="container main-container">
+    <div class="col-md-4">
+      <h1 class="logo">Jadegarden
+    <div class="col-md-8">
+      <nav>
+        <ul>
+          <li><a href="@{HomeR}">Home</a></li>
+          <li><a href="@{MenuR}">Menu</a></li>
+^{w}

@@ -17,6 +17,7 @@ library
                      Foundation
                      Import
                      Import.Base
+                     Import.Piece
                      Import.Cookie
                      Model
                      Settings
