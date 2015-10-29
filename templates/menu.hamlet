@@ -2,33 +2,20 @@
   <div class="col-md-12">
     <h1>Menu</h1>
 
-    <div class="list-group menu">
-      <div class="list-group-item">
-        <h4 class="list-group-item-heading">Soups
+    $if null rows
+      <p>No products
+    $else
+      <div class="list-group menu">
+        $forall (category, products) <- rows
+          <div class="list-group-item">
+            <h4 class="list-group-item-heading">#{categoryName category}
 
-      <div class="list-group-item">
-        <div class="container-fluid">
-          <div class="col-sm-10">
-            <p>Derperino</p>
-          <div class="col-md-2 text-right">
-            <div class="btn-group">
-              <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-plus"></div></a>
-              <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-minus"></div></a>
-
-      <div class="list-group-item">
-        <div class="container-fluid">
-          <div class="col-sm-10">
-            <p>Derperino</p>
-          <div class="col-md-2 text-right">
-            <div class="btn-group">
-              <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-plus"></div></a>
-              <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-minus"></div></a>
-
-      <div class="list-group-item">
-        <div class="container-fluid">
-          <div class="col-sm-10">
-            <p>Derperino</p>
-          <div class="col-md-2 text-right">
-            <div class="btn-group">
-              <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-plus"></div></a>
-              <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-minus"></div></a>
+          $forall product <- products
+           <div class="list-group-item">
+            <div class="container-fluid">
+              <div class="col-sm-10">
+                <p>#{productName product} - #{productPrice product}</p>
+              <div class="col-md-2 text-right">
+                <div class="btn-group">
+                  <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-plus"></div></a>
+                  <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-minus"></div></a>

@@ -35,9 +35,13 @@ Address
     postcode Text
 Product
     deployment DeploymentId
+    category CategoryId
     name Text
     description Text
     price Int
+Category
+    name Text
+    deployment DeploymentId
 Order
     user UserId
 OrderLine
