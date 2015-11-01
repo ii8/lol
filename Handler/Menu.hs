@@ -5,7 +5,7 @@ import Data.Ord (comparing)
 
 getMenuR :: Handler Html
 getMenuR = do
-  let rows = query
+  rows <- runDB query
 
   defaultLayout $ do
     $(widgetFile "menu")
