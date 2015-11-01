@@ -41,6 +41,7 @@ Product
     price Int
 Category
     name Text
+    order Int
     deployment DeploymentId
 Order
     user UserId

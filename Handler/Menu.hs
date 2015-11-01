@@ -11,7 +11,7 @@ getMenuR = do
     $(widgetFile "menu")
 
 query = do
-  cats <- selectList [] [Asc CategoryName]
+  cats <- selectList [] [Asc CategoryOrder]
   forM cats $ \(Entity catId cat) -> do
       products <- selectList
           [ProductCategory ==. catId]

@@ -2,20 +2,40 @@
   <div class="col-md-12">
     <h1>Menu</h1>
 
-    $if null rows
-      <p>No products
-    $else
+  $if null rows
+    <p>No products
+  $else
+    <div class="col-md-9">
       <div class="list-group menu">
         $forall (category, products) <- rows
           <div class="list-group-item">
             <h4 class="list-group-item-heading">#{categoryName category}
 
           $forall product <- products
-           <div class="list-group-item">
+           <div class="list-group-item product">
             <div class="container-fluid">
               <div class="col-sm-10">
                 <p>#{productName product} - #{productPrice product}</p>
               <div class="col-md-2 text-right">
                 <div class="btn-group">
-                  <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-plus"></div></a>
-                  <a class="btn btn-default btn-xs"><div class="glyphicon glyphicon-minus"></div></a>
+                  <input type="hidden" class="productId" value=""/>
+                  <a class="btn btn-default btn-xs increase"><div class="glyphicon glyphicon-plus"></div></a>
+                  <a class="btn btn-default btn-xs decrease"><div class="glyphicon glyphicon-minus"></div></a>
+
+<div class="container main-container" style="position: fixed">
+  <div id="floating-basket" class="col-md-3">
+    <h3>Your Order
+    <div class="btn-group">
+      <a class="btn btn-default active">Delivery</a>
+      <a class="btn btn-default">Collection</a>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Item
+          <th>Total
+      <tbody id="visual-basket">
+      <tfoot>
+        <tr>
+          <th>Total
+          <th>0.00
+    <a class="btn btn-success">Order Now</a>
