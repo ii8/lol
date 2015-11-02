@@ -1,6 +1,11 @@
 module Handler.Menu where
 
 import Import
+<<<<<<< HEAD
+=======
+import Data.Ord (comparing)
+import Database.Persist.Sql (fromSqlKey)
+>>>>>>> Some more menu changes and handler change thingy that makes the product id thingy work.
 
 getMenuR :: Handler Html
 getMenuR = do
@@ -14,4 +19,4 @@ query = do
         products <- selectList
             [ProductCategory ==. catId]
             [Asc ProductName]
-        return (cat, map entityVal products)
+        return (cat, products)
