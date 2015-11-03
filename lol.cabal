@@ -90,6 +90,7 @@ library
                  , time
                  , wai
                  , attoparsec
+                 , blaze-markup
 
 executable         lol
     if flag(library-only)

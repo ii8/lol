@@ -7,6 +7,7 @@ import Text.Read (read)
 import Data.List (tail)
 import qualified Data.Text as T
 import Database.Persist.Sql (PersistFieldSql(..))
+import Text.Blaze (ToMarkup(..))
 
 newtype Money = Money Int
 
@@ -34,9 +35,8 @@ instance PersistField Money where
 instance PersistFieldSql Money where
     sqlType _ = SqlInt64
 
---How to make this work??
---instance ToHtml Money where
---    toHtml a = "&pound;" ++ dot a
+instance ToMarkup Money where
+    toMarkup a = "£" ++ (toMarkup (dot a))
 
 moneyField :: Monad m => RenderMessage (HandlerSite m) FormMessage => Field m Money
 moneyField = Field { fieldParse = parse, fieldView = view, fieldEnctype = UrlEncoded }

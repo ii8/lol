@@ -7,6 +7,7 @@ import Database.Persist.Sql (toSqlKey)
 form :: Form Product
 form = renderDivs $ Product
     <$> pure (toSqlKey 1)
+    <*> pure (toSqlKey 1)
     <*> areq textField "Name" Nothing
     <*> areq textField "Description" Nothing
     <*> areq moneyField "Price" Nothing
