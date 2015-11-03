@@ -1,0 +1,3 @@
+
+$forall (Entity _ (Product _ p _ _)) <- ps
+  <p>#{p}

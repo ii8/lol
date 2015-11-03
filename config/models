@@ -38,7 +38,7 @@ Product
     category CategoryId
     name Text
     description Text
-    price Int
+    price Money
 Category
     name Text
     order Int
@@ -48,7 +48,7 @@ Order
 OrderLine
     order OrderId
     product ProductId
-    price Int
+    price Money
     quantity Int
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

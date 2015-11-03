@@ -19,6 +19,7 @@ library
                      Import.Base
                      Import.Piece
                      Import.Cookie
+                     Import.Money
                      Model
                      Settings
                      Settings.StaticFiles
@@ -26,6 +27,7 @@ library
                      Handler.Custom
                      Handler.Menu
                      Handler.Order
+                     Handler.Product
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
