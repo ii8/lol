@@ -100,11 +100,11 @@ instance Yesod App where
     -- users receiving stale content.
     addStaticContent ext mime content = do
         master <- getYesod
-        let staticDir = appStaticDir $ appSettings master
+        let settings = appSettings master
         addStaticContentExternal
-            minifym
+            (if appMinify settings then minifym else Right)
             genFileName
-            staticDir
+            (appStaticDir settings)
             (StaticR . flip StaticRoute [])
             ext
             mime

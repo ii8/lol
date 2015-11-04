@@ -46,6 +46,8 @@ data AppSettings = AppSettings
     -- ^ Assume that files in the static dir may change after compilation
     , appSkipCombining          :: Bool
     -- ^ Perform no stylesheet/script combining
+    , appMinify                 :: Bool
+    -- ^ Minify javascript and css when generating cache
 
     -- Example app-specific configuration values.
     , appCopyright              :: Text
@@ -74,6 +76,7 @@ instance FromJSON AppSettings where
         appReloadTemplates        <- o .:? "reload-templates" .!= defaultDev
         appMutableStatic          <- o .:? "mutable-static"   .!= defaultDev
         appSkipCombining          <- o .:? "skip-combining"   .!= defaultDev
+        appMinify                 <- o .:? "minify"           .!= (not defaultDev)
 
         appCopyright              <- o .: "copyright"
         appAnalytics              <- o .:? "analytics"

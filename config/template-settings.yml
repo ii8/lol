@@ -16,6 +16,7 @@ ip-from-header: "_env:IP_FROM_HEADER:false"
 # reload-templates: false
 # mutable-static: false
 # skip-combining: false
+# minify: true
 
 database:
   user:     "_env:MYSQL_USER:root"
