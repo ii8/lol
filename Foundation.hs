@@ -9,6 +9,7 @@ import Yesod.Auth.Message   (AuthMessage (InvalidLogin))
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
+import qualified Network.Wai as Wai
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -50,7 +51,9 @@ wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 instance Yesod App where
     -- Controls the base of generated URLs. For more information on modifying,
     -- see: https://github.com/yesodweb/yesod/wiki/Overriding-approot
-    approot = ApprootMaster $ appRoot . appSettings
+    approot = ApprootRequest $ \_ r -> maybe ""
+        (mappend ("http://" :: Text) . decodeUtf8)
+        (lookup "host" . Wai.requestHeaders $ r)
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes

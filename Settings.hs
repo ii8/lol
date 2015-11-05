@@ -7,8 +7,7 @@ module Settings where
 
 import ClassyPrelude.Yesod
 import Control.Exception          (throw)
-import Data.Aeson                 (Result (..), fromJSON, withObject, (.!=),
-                                   (.:?))
+import Data.Aeson                 (Result (..), fromJSON, withObject, (.!=), (.:?))
 import Data.FileEmbed             (embedFile)
 import Data.Yaml                  (decodeEither')
 import Database.Persist.MySQL     (MySQLConf)
@@ -26,8 +25,6 @@ data AppSettings = AppSettings
     -- ^ Directory from which to serve static files.
     , appDatabaseConf           :: MySQLConf
     -- ^ Configuration settings for accessing the database.
-    , appRoot                   :: Text
-    -- ^ Base for all generated URLs.
     , appHost                   :: HostPreference
     -- ^ Host/interface the server should bind to.
     , appPort                   :: Int
@@ -66,7 +63,6 @@ instance FromJSON AppSettings where
 #endif
         appStaticDir              <- o .: "static-dir"
         appDatabaseConf           <- o .: "database"
-        appRoot                   <- o .: "approot"
         appHost                   <- fromString <$> o .: "host"
         appPort                   <- o .: "port"
         appIpFromHeader           <- o .: "ip-from-header"
