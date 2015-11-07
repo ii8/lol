@@ -1,4 +1,3 @@
-
 function menu_mod(product, i)
 {
     quantity = order_mod(product, i);
