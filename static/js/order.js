@@ -76,5 +76,14 @@ function order_get(p)
 {
   var cookie = _order_get();
 
-  return cookie;
+  for(i = 0; i < cookie.length; i++)
+  {
+    if(cookie[i]['product'] == p)
+      return cookie[i]['quantity'];
+  }
+  return 0;
+}
+function order_get_all()
+{
+  return _order_get();
 }

@@ -1,14 +1,30 @@
-function get_productid( derp )
-{
-  return $(derp).parent().find('.productid');
-}
+$(".CookeControls .btn").click( function() {
+  if($(this).hasClass('increase'))
+    order_inc($(this).parent().parent().find('.productId').val());
+  if($(this).hasClass('decrease'))
+    order_dec($(this).parent().parent().find('.productId').val());
 
-$(".product .decrease").click( function() {
-  order_dec( get_productid( this ) );
-  console.log( order_get( get_productid( this )) );
+  $(this).parent().parent().find('.productQuantity').html( order_get($(this).parent().parent().find('.productId').val()));
+
+  UpdateCart();
 });
 
-$(".product .increase").on('click tap', function() {
-  order_inc( get_productid( this ) );
-  console.log( order_get(get_productid( this )) );
+function UpdateCart()
+{
+  cookie = order_get_all()
+
+  $("#visual-basket").html("");
+
+  for(i = 0; i < cookie.length; i++)
+  {
+    $("#visual-basket").append(
+      "<tr><td>"+$("#product"+cookie[i]['product']).find('.productName').val()+"</td>"+
+      "<td>"+cookie[i]['quantity']+"</td></tr>"
+    );
+  }
+}
+
+$("#CollectDeliver .btn").click( function() {
+  if(!$(this).hasClass('active'))
+    $("#CollectDeliver .btn").toggleClass('active');
 });
