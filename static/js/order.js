@@ -72,3 +72,9 @@ function order_dec(product)
 {
     order_mod(product, -1);
 }
+function order_get(p)
+{
+  var cookie = _order_get();
+
+  return cookie;
+}

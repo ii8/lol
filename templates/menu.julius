@@ -1,0 +1,14 @@
+function get_productid( derp )
+{
+  return $(derp).parent().find('.productid');
+}
+
+$(".product .decrease").click( function() {
+  order_dec( get_productid( this ) );
+  console.log( order_get( get_productid( this )) );
+});
+
+$(".product .increase").on('click tap', function() {
+  order_inc( get_productid( this ) );
+  console.log( order_get(get_productid( this )) );
+});

@@ -1,5 +1,8 @@
-<div>
-$maybe lol <- lolvar
-  <p>#{lol}
-$nothing
-  <p>No order
+<div class="container main-container">
+  <div class="col-md-12">
+    <div class="col-md-12">
+      <h1>Place an Order</h1>
+      $maybe lol <- lolvar
+        <p>#{lol}
+      $nothing
+        <p>No order

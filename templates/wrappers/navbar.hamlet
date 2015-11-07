@@ -1,10 +1,19 @@
-<header>
+<header class="container-fluid">
   <div class="container main-container">
     <div class="col-md-4">
       <h1 class="logo">Jadegarden
     <div class="col-md-8">
-      <nav>
-        <ul>
-          <li><a href="@{HomeR}">Home</a></li>
-          <li><a href="@{MenuR}">Menu</a></li>
+      <nav class="navbar navbar-simple" role="navigation">
+        <div class="container-fluid navbar-inner">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+          <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="@{HomeR}">Home</a></li>
+              <li><a href="@{MenuR}">Menu</a></li>
+              <li><a href="">Login</a></li>
 ^{w}

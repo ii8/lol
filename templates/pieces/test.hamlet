@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <h1>Authentic Chinese Food
     <div class="col-md-12">
-      <a href="">Order</a>
+      <a href="@{MenuR}">Order</a>
       <a href="">Book</a>
 
 <div class="container main-container">

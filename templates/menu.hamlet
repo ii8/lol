@@ -1,4 +1,4 @@
-<div class="container main-container begin-template">
+<div class="container main-container">
   <div class="col-md-12">
     <h1>Menu</h1>
 
@@ -17,25 +17,26 @@
               <div class="col-sm-10">
                 <p>#{productName product} - #{productPrice product}</p>
               <div class="col-md-2 text-right">
+                <input type="hidden" class="productId" value=" #{fromSqlKey key}"/>
                 <div class="btn-group">
-                  <input type="hidden" class="productId" value=" #{fromSqlKey key}"/>
                   <a class="btn btn-default btn-xs increase"><div class="glyphicon glyphicon-plus"></div></a>
                   <a class="btn btn-default btn-xs decrease"><div class="glyphicon glyphicon-minus"></div></a>
 
-<div class="container main-container" style="position: fixed">
-  <div id="floating-basket" class="col-md-3">
-    <h3>Your Order
-    <div class="btn-group">
-      <a class="btn btn-default active">Delivery</a>
-      <a class="btn btn-default">Collection</a>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Item
-          <th>Total
-      <tbody id="visual-basket">
-      <tfoot>
-        <tr>
-          <th>Total
-          <th>0.00
-    <a class="btn btn-success">Order Now</a>
+    <div class="col-md-3">
+      <div class="affix basket-container">
+        <div class="padding">
+          <h3>Your Order
+          <div class="btn-group">
+            <a class="btn btn-default active">Delivery</a>
+            <a class="btn btn-default">Collection</a>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Item
+                <th>Total
+            <tbody id="visual-basket">
+            <tfoot>
+              <tr>
+                <th>Total
+                <th>0.00
+          <a href="@{OrderR}" class="btn btn-green">Order Now</a>
