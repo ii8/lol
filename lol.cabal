@@ -17,6 +17,7 @@ library
                      Foundation
                      Import
                      Import.Base
+                     Import.Enum
                      Import.Piece
                      Import.Cookie
                      Import.Money
@@ -91,6 +92,7 @@ library
                  , wai
                  , attoparsec
                  , blaze-markup
+                 , mime-mail
 
 executable         lol
     if flag(library-only)

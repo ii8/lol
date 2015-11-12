@@ -14,20 +14,14 @@ form = renderDivs $ Product
 
 getProductR :: Handler Html
 getProductR = do
-    ps <- runDB $ selectList [] [Asc ProductPrice]
+    deployment <- getDeployment
+    ps <- runDB $ selectList [ProductDeployment ==. deployment] [Asc ProductPrice]
     defaultLayout $(widgetFile "product-list")
 
-getProductNewR :: Handler Html
-getProductNewR = do
+getProductEditR :: Key Product -> Handler Html
+getProductEditR _ = do
     ((result, widget), enc) <- runFormPost form
     defaultLayout $(widgetFile "product-edit")
-
-
-postProductNewR :: Handler Html
-postProductNewR = getProductNewR
-
-getProductEditR :: Key Product -> Handler Html
-getProductEditR p = notFound
 
 postProductEditR :: Key Product -> Handler Html
 postProductEditR p = notFound

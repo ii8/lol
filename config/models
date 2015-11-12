@@ -18,10 +18,12 @@ PieceData
 User
     deployment DeploymentId
     email Text
-    password Text
+    password Text Maybe
     type Int
     first Text
     last Text
+    verkey Text Maybe
+    verified Bool
     UniqueUser email
 --Customer
 

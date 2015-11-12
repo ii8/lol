@@ -15,5 +15,8 @@
             <ul class="nav navbar-nav navbar-right">
               <li><a href="@{HomeR}">Home</a></li>
               <li><a href="@{MenuR}">Menu</a></li>
-              <li><a href="">Login</a></li>
+              $maybe _ <- maid
+                <li><a href="@{AuthR LogoutR}">Logout</a></li>
+              $nothing
+                <li><a href="@{AuthR LoginR}">Login</a></li>
 ^{w}

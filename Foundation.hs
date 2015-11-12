@@ -1,15 +1,19 @@
 module Foundation where
 
 import Import.Base
+import Import.Enum
 import Model
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
-import Text.Jasmine         (minifym)
-import Yesod.Auth.BrowserId (authBrowserId)
-import Yesod.Auth.Message   (AuthMessage (InvalidLogin))
-import Yesod.Default.Util   (addStaticContentExternal)
-import Yesod.Core.Types     (Logger)
+import Text.Jasmine (minifym)
+import Yesod.Auth.Email
+import Yesod.Auth.Message (AuthMessage (InvalidLogin))
+import Yesod.Default.Util (addStaticContentExternal)
+import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Network.Wai as Wai
+
+import qualified Network.Mail.Mime as Mail
+import Text.Shakespeare.Text (stext)
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -42,8 +46,25 @@ mkYesodData "App" $(parseRoutesFile "config/routes")
 -- | A convenient synonym for creating forms.
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
+newtype CachedDeploymentId key
+    = CachedDeploymentId { unCachedDeploymentId :: key }
+    deriving Typeable
+
+getDeployment' :: Handler DeploymentId
+getDeployment' = do
+    domain <- runInputGet $ ireq textField "domain"
+    (Entity deployment _) <- runDB $ getBy404 $ UniqueDomain domain
+    return deployment
+
+getDeployment :: Handler DeploymentId
+getDeployment = do
+    a <- getDeployment'
+    let b = return $ CachedDeploymentId a
+    c <- cached b
+    return $ unCachedDeploymentId c
+
 wrap :: Widget -> Text -> Widget
-wrap w "navbar" = $(widgetFile "wrappers/navbar")
+wrap w "navbar" = handlerToWidget maybeAuthId >>= (\maid -> $(widgetFile "wrappers/navbar"))
 wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 
 -- Please see the documentation for the Yesod typeclass. There are a number
@@ -62,13 +83,13 @@ instance Yesod App where
         "config/client_session_key.aes"
 
     defaultLayout widget = do
+        -- Can't use getBy404 because the subwidget might be a 404 response already.
         domain <- runInputGet $ ireq textField "domain"
-        (Entity _ (Deployment _ _ wrapper)) <- runDB $ getBy404 $ UniqueDomain domain
-        -- We break up the default layout into two components:
-        -- default-layout is the contents of the body tag, and
-        -- default-layout-wrapper is the entire page. Since the final
-        -- value passed to hamletToRepHtml cannot be a widget, this allows
-        -- you to use normal widget features in default-layout.
+        wrapper <- runDB $ do
+            d <- getBy $ UniqueDomain domain
+            return $ case d of
+                Just (Entity _ (Deployment _ _ w)) -> w
+                Nothing -> ""
 
         pc <- widgetToPageContent $ do
             addStylesheet $ StaticR css_bootstrap_css
@@ -133,6 +154,7 @@ instance YesodPersist App where
     runDB action = do
         master <- getYesod
         runSqlPool action $ appConnPool master
+
 instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner appConnPool
 
@@ -144,6 +166,7 @@ instance YesodAuth App where
     -- Where to send a user after logout
     logoutDest _ = HomeR
     -- Override the above two destinations when a Referer: header is present
+    -- Maybe use ultimate destination later
     redirectToReferer _ = True
 
     authenticate creds = runDB $ do
@@ -153,9 +176,17 @@ instance YesodAuth App where
             Nothing -> UserError InvalidLogin
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def]
+    authPlugins _ = [authEmail]
 
-    authHttpManager = getHttpManager
+    loginHandler = do
+        tp <- getRouteToParent
+        lift $ authLayout $ do
+            setTitle "Login"
+            let box = apLogin authEmail tp
+            $(widgetFile "login")
+
+    --authHttpManager = getHttpManager
+    authHttpManager = error "authHttpManager"
 
 instance YesodAuthPersist App
 
@@ -163,6 +194,51 @@ instance YesodAuthPersist App
 -- achieve customized and internationalized form validation messages.
 instance RenderMessage App FormMessage where
     renderMessage _ _ = defaultFormMessage
+
+instance YesodAuthEmail App where
+    type AuthEmailId App = UserId
+
+    afterPasswordRoute _ = HomeR
+
+    addUnverified email verkey = do
+        d <- getDeployment
+        runDB $ insert $ User d email Nothing userCustomer "" "" (Just verkey) False
+
+    sendVerifyEmail email _ verurl = liftIO $ Mail.renderSendMail $ Mail.simpleMail'
+        (Mail.Address Nothing email)
+        (Mail.Address Nothing "jonathan.landahl@phpartnership.com")
+        "Verify"
+         [stext|
+             Please confirm your email address by clicking on the link below.
+
+             #{verurl}
+
+             Thank you
+         |]
+
+    getVerifyKey = runDB . fmap (join . fmap userVerkey) . get
+    setVerifyKey uid key = runDB $ update uid [UserVerkey =. Just key]
+    verifyAccount uid = runDB $ do
+        mu <- get uid
+        case mu of
+            Nothing -> return Nothing
+            Just _ -> do
+                update uid [UserVerified =. True]
+                return $ Just uid
+    getPassword = runDB . fmap (join . fmap userPassword) . get
+    setPassword uid pass = runDB $ update uid [UserPassword =. Just pass]
+    getEmailCreds email = runDB $ do
+        mu <- getBy $ UniqueUser email
+        case mu of
+            Nothing -> return Nothing
+            Just (Entity uid u) -> return $ Just EmailCreds
+                { emailCredsId = uid
+                , emailCredsAuthId = Just uid
+                , emailCredsStatus = isJust $ userPassword u
+                , emailCredsVerkey = userVerkey u
+                , emailCredsEmail = email
+                }
+    getEmail = runDB . fmap (fmap userEmail) . get
 
 unsafeHandler :: App -> Handler a -> IO a
 unsafeHandler = Unsafe.fakeHandlerGetLogger appLogger

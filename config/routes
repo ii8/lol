@@ -7,8 +7,7 @@
 /menu MenuR GET
 /order OrderR GET POST
 /product ProductR GET
-/product/new ProductNewR GET POST
-!/product/#ProductId ProductEditR GET POST
+/product/#ProductId ProductEditR GET POST
 
 / HomeR GET
 !/#Text CustomR GET

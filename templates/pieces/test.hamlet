@@ -17,4 +17,4 @@
   <div class="col-md-12">
     <h2>Deployment: #{domainName}
 
-    <p>The LOL wins every time
+    <p>The LOL wins every time #{fromSqlKey lolDep} #{fromSqlKey nutherDep}
