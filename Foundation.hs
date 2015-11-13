@@ -64,7 +64,10 @@ getDeployment = do
     return $ unCachedDeploymentId c
 
 wrap :: Widget -> Text -> Widget
-wrap w "navbar" = handlerToWidget maybeAuthId >>= (\maid -> $(widgetFile "wrappers/navbar"))
+wrap w "navbar" = do
+    maid <- handlerToWidget maybeAuthId
+    manager <- handlerToWidget authManager
+    $(widgetFile "wrappers/navbar")
 wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 
 -- Please see the documentation for the Yesod typeclass. There are a number
@@ -113,11 +116,11 @@ instance Yesod App where
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
 
-    -- Routes not requiring authentication.
-    isAuthorized (AuthR _) _ = return Authorized
-    isAuthorized FaviconR _ = return Authorized
-    isAuthorized RobotsR _ = return Authorized
-    -- Default to Authorized for now.
+    isAuthorized ProductR _ = authManager'
+    isAuthorized (ProductEditR _) _ = authManager'
+    --isAuthorized (AuthR _) _ = return Authorized
+    --isAuthorized FaviconR _ = return Authorized
+    --isAuthorized RobotsR _ = return Authorized
     isAuthorized _ _ = return Authorized
 
     -- This function creates static content files in the static folder
@@ -167,7 +170,7 @@ instance YesodAuth App where
     logoutDest _ = HomeR
     -- Override the above two destinations when a Referer: header is present
     -- Maybe use ultimate destination later
-    redirectToReferer _ = True
+    redirectToReferer _ = False
 
     authenticate creds = runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds
@@ -187,6 +190,24 @@ instance YesodAuth App where
 
     --authHttpManager = getHttpManager
     authHttpManager = error "authHttpManager"
+
+authManager' :: Handler AuthResult
+authManager' = do
+    maid <- maybeAuthId
+    case maid of
+        Nothing -> return AuthenticationRequired
+        Just aid -> do
+            user <- runDB $ get aid
+            case user of
+                Nothing -> return AuthenticationRequired
+                Just u -> if userType u >= userManager
+                    then return Authorized
+                    else return $ Unauthorized "Managers only"
+
+authManager :: Handler Bool
+authManager = authManager' >>= (\a -> case a of
+    Authorized -> return True
+    _ -> return False)
 
 instance YesodAuthPersist App
 

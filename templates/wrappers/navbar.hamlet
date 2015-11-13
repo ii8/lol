@@ -16,6 +16,8 @@
               <li><a href="@{HomeR}">Home</a></li>
               <li><a href="@{MenuR}">Menu</a></li>
               $maybe _ <- maid
+                $if manager
+                  <li><a href="@{ProductR}">Manage Products</a></li>
                 <li><a href="@{AuthR LogoutR}">Logout</a></li>
               $nothing
                 <li><a href="@{AuthR LoginR}">Login</a></li>
