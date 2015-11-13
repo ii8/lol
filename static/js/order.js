@@ -41,49 +41,56 @@ function _order_mod(rel, p, q)
             else
                 c.quantity = q;
 
-            if(c.quantity <= 0)
+            if(c.quantity <= 0) {
                 cookie.splice(i, 1);
+                _order_put(cookie);
+                return 0;
+            }
             _order_put(cookie);
-            return;
+            return c.quantity;
         }
     }
     if(q <= 0)
-        return;
+        return 0;
     cookie.push({product: p, quantity: q});
     _order_put(cookie);
+    return q;
 }
 
 function order_mod(p, q)
 {
-    _order_mod(true, p, q);
+    return _order_mod(true, p, q);
 }
 
 function order_set(p, q)
 {
-    _order_mod(false, p, q);
+    return _order_mod(false, p, q);
 }
 
 function order_inc(product)
 {
-    order_mod(product, 1);
+    return order_mod(product, 1);
 }
 
 function order_dec(product)
 {
-    order_mod(product, -1);
+    return order_mod(product, -1);
 }
+
 function order_get(p)
 {
-  var cookie = _order_get();
+    var cookie = _order_get();
 
-  for(i = 0; i < cookie.length; i++)
-  {
-    if(cookie[i]['product'] == p)
-      return cookie[i]['quantity'];
-  }
-  return 0;
+    for(var i=0; i < cookie.length; i++) {
+        var c = cookie[i];
+
+        if(p == c.product)
+            return c.quantity;
+    }
+    return 0;
 }
+
 function order_get_all()
 {
-  return _order_get();
+    return _order_get();
 }

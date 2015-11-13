@@ -1,30 +1,26 @@
-$(".CookeControls .btn").click( function() {
-  if($(this).hasClass('increase'))
-    order_inc($(this).parent().parent().find('.productId').val());
-  if($(this).hasClass('decrease'))
-    order_dec($(this).parent().parent().find('.productId').val());
 
-  $(this).parent().parent().find('.productQuantity').html( order_get($(this).parent().parent().find('.productId').val()));
-
-  UpdateCart();
-});
-
-function UpdateCart()
+function menu_mod(product, i)
 {
-  cookie = order_get_all()
+    quantity = order_mod(product, i);
+    $('#quantity-display-' + product).html(quantity);
+    _update_cart();
+}
 
-  $("#visual-basket").html("");
+function _update_cart()
+{
+    cookie = order_get_all()
 
-  for(i = 0; i < cookie.length; i++)
-  {
-    $("#visual-basket").append(
-      "<tr><td>"+$("#product"+cookie[i]['product']).find('.productName').val()+"</td>"+
-      "<td>"+cookie[i]['quantity']+"</td></tr>"
-    );
-  }
+    $("#visual-basket").html("");
+
+    for(var i = 0; i < cookie.length; i++)
+    {
+        $("#visual-basket").append(
+        "<tr><td>"+$("#product"+cookie[i]['product']).find('.productName').val()+"</td>"+
+        "<td>"+cookie[i]['quantity']+"</td></tr>"
+        );
+    }
 }
 
 $("#CollectDeliver .btn").click( function() {
-  if(!$(this).hasClass('active'))
     $("#CollectDeliver .btn").toggleClass('active');
 });
