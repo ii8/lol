@@ -36,15 +36,14 @@ Address
     county Text
     postcode Text
 Product
-    deployment DeploymentId
     category CategoryId
     name Text
     description Text
     price Money
 Category
+    deployment DeploymentId
     name Text
     order Int
-    deployment DeploymentId
 Order
     user UserId
 OrderLine
@@ -53,4 +52,3 @@ OrderLine
     price Money
     quantity Int
 
- -- By default this file is used in Model.hs (which is imported by Foundation.hs)

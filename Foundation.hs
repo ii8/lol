@@ -66,7 +66,7 @@ getDeployment = do
 wrap :: Widget -> Text -> Widget
 wrap w "navbar" = do
     maid <- handlerToWidget maybeAuthId
-    manager <- handlerToWidget authManager
+    manager <- handlerToWidget $ checkLevel userManager
     $(widgetFile "wrappers/navbar")
 wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 
@@ -116,12 +116,10 @@ instance Yesod App where
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
 
-    isAuthorized ProductR _ = authManager'
-    isAuthorized (ProductEditR _) _ = authManager'
-    --isAuthorized (AuthR _) _ = return Authorized
-    --isAuthorized FaviconR _ = return Authorized
-    --isAuthorized RobotsR _ = return Authorized
-    isAuthorized _ _ = return Authorized
+    isAuthorized route _
+        | "admin" `member` routeAttrs route = checkLevel' userAdmin
+        | "manager" `member` routeAttrs route = checkLevel' userManager
+        | otherwise = return Authorized
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -178,7 +176,6 @@ instance YesodAuth App where
             Just (Entity uid _) -> Authenticated uid
             Nothing -> UserError InvalidLogin
 
-    -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authEmail]
 
     loginHandler = do
@@ -191,8 +188,8 @@ instance YesodAuth App where
     --authHttpManager = getHttpManager
     authHttpManager = error "authHttpManager"
 
-authManager' :: Handler AuthResult
-authManager' = do
+checkLevel' :: Int -> Handler AuthResult
+checkLevel' level = do
     maid <- maybeAuthId
     case maid of
         Nothing -> return AuthenticationRequired
@@ -200,14 +197,14 @@ authManager' = do
             user <- runDB $ get aid
             case user of
                 Nothing -> return AuthenticationRequired
-                Just u -> if userType u >= userManager
+                Just u -> if userType u >= level
                     then return Authorized
-                    else return $ Unauthorized "Managers only"
+                    else return $ Unauthorized "Sorry, ur under 9000"
 
-authManager :: Handler Bool
-authManager = authManager' >>= (\a -> case a of
+checkLevel :: Int -> Handler Bool
+checkLevel level = checkLevel' level >>= \a -> case a of
     Authorized -> return True
-    _ -> return False)
+    _ -> return False
 
 instance YesodAuthPersist App
 

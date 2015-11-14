@@ -1,3 +1,5 @@
 
-$forall (Entity _ (Product _ _ p _ _)) <- ps
-  <p>#{p}
+<a href="@{ProductNewR}">New Product
+
+$forall (DB.Value product, DB.Value price, DB.Value category) <- ps
+  <p>#{product}, #{price}, #{category}

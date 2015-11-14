@@ -1,13 +1,14 @@
 /static StaticR Static appStatic
 /auth   AuthR   Auth   getAuth
 
-/favicon.ico FaviconR GET
-/robots.txt RobotsR GET
+/favicon.ico            FaviconR        GET
+/robots.txt             RobotsR         GET
 
-/menu MenuR GET
-/order OrderR GET POST
-/product ProductR GET
-/product/#ProductId ProductEditR GET POST
+/menu                   MenuR           GET
+/order                  OrderR          GET POST
+/product                ProductR        GET      !manager
+/product/new            ProductNewR     GET POST !manager
+!/product/#ProductId    ProductEditR    GET POST !manager
 
-/ HomeR GET
-!/#Text CustomR GET
+/                       HomeR           GET
+!/#Text                 CustomR         GET
