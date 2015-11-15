@@ -24,7 +24,7 @@ User
     last Text
     verkey Text Maybe
     verified Bool
-    UniqueUser email
+    UniqueUser deployment email
 --Customer
 
 Address

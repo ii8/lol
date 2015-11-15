@@ -170,8 +170,8 @@ instance YesodAuth App where
     -- Maybe use ultimate destination later
     redirectToReferer _ = False
 
-    authenticate creds = runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
+    authenticate creds = getDeployment >>= \d -> runDB $ do
+        x <- getBy $ UniqueUser d (credsIdent creds)
         return $ case x of
             Just (Entity uid _) -> Authenticated uid
             Nothing -> UserError InvalidLogin
@@ -193,13 +193,15 @@ checkLevel' level = do
     maid <- maybeAuthId
     case maid of
         Nothing -> return AuthenticationRequired
-        Just aid -> do
-            user <- runDB $ get aid
-            case user of
-                Nothing -> return AuthenticationRequired
-                Just u -> if userType u >= level
-                    then return Authorized
-                    else return $ Unauthorized "Sorry, ur under 9000"
+        Just aid -> checkUser aid
+  where
+    checkUser key = do
+        user <- runDB $ get key
+        case user of
+            Nothing -> return AuthenticationRequired
+            Just u -> if userType u >= level
+                then return Authorized
+                else return $ Unauthorized "Sorry, ur under 9000"
 
 checkLevel :: Int -> Handler Bool
 checkLevel level = checkLevel' level >>= \a -> case a of
@@ -245,8 +247,8 @@ instance YesodAuthEmail App where
                 return $ Just uid
     getPassword = runDB . fmap (join . fmap userPassword) . get
     setPassword uid pass = runDB $ update uid [UserPassword =. Just pass]
-    getEmailCreds email = runDB $ do
-        mu <- getBy $ UniqueUser email
+    getEmailCreds email = getDeployment >>= \d -> runDB $ do
+        mu <- getBy $ UniqueUser d email
         case mu of
             Nothing -> return Nothing
             Just (Entity uid u) -> return $ Just EmailCreds
