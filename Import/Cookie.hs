@@ -1,12 +1,12 @@
 
 module Import.Cookie (renderOrder, parseOrder) where
 
-import Import.Base
+import Import.Base hiding (Value)
 import Model
 import Database.Persist.Sql (fromSqlKey)
 import Data.Aeson.Encode (encodeToTextBuilder)
 import Data.Text.Lazy.Builder (toLazyText)
-import Data.Aeson.Types (Parser, parseMaybe, withObject, withArray)
+import Data.Aeson.Types (Value, Parser, parseMaybe, withObject, withArray)
 import Data.Aeson.Parser (json)
 import Data.Attoparsec.ByteString (parse, IResult(Done))
 

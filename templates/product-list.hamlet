@@ -1,5 +1,5 @@
 
 <a href="@{ProductNewR}">New Product
 
-$forall (DB.Value product, DB.Value price, DB.Value category) <- ps
+$forall (Value product, Value price, Value category) <- ps
   <p>#{product}, #{price}, #{category}

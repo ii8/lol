@@ -1,9 +1,9 @@
 
 module Handler.Product where
 
-import Import
+import Import hiding (Value, on, (==.))
 import Database.Persist.Sql (toSqlKey)
-import Database.Esqueleto as DB
+import Database.Esqueleto
 
 form :: OptionList CategoryId -> Form Product
 form cats = renderDivs $ Product
@@ -12,23 +12,23 @@ form cats = renderDivs $ Product
     <*> areq textField "Description" Nothing
     <*> areq moneyField "Price" Nothing
 
-queryProudctList :: Handler [(DB.Value Text, DB.Value Money, DB.Value Text)]
+queryProudctList :: Handler [(Value Text, Value Money, Value Text)]
 queryProudctList = do
     d <- getDeployment
-    runDB $ DB.select $ DB.from $ \(c `DB.LeftOuterJoin` p) -> do
-        DB.on (c ^. CategoryId DB.==. p ^. ProductCategory)
-        DB.where_ (c ^. CategoryDeployment DB.==. (val d))
+    runDB $ select $ from $ \(c `LeftOuterJoin` p) -> do
+        on (c ^. CategoryId ==. p ^. ProductCategory)
+        where_ (c ^. CategoryDeployment ==. (val d))
         return
             ( p ^. ProductName
             , p ^. ProductPrice
             , c ^. CategoryName
             )
 
-queryCategoryList :: Handler [(DB.Value Text, DB.Value CategoryId)]
+queryCategoryList :: Handler [(Value Text, Value CategoryId)]
 queryCategoryList = do
     d <- getDeployment
-    runDB $ DB.select $ DB.from $ \c -> do
-        DB.where_ (c ^. CategoryDeployment DB.==. (val d))
+    runDB $ select $ from $ \c -> do
+        where_ (c ^. CategoryDeployment ==. (val d))
         return (c ^. CategoryName, c ^. CategoryId)
 
 getProductR :: Handler Html
