@@ -1,5 +1,5 @@
 
-module Import.Cookie (renderOrder, parseOrder) where
+module Import.Cookie (OrderCookie(..), renderOrder, parseOrder) where
 
 import Import.Base hiding (Value)
 import Model
@@ -32,4 +32,3 @@ parseOrder s = let bs = encodeUtf8 s in
 
 renderOrder :: OrderCookie -> Text
 renderOrder = toStrict . toLazyText . encodeToTextBuilder . toJSON
-

@@ -2,7 +2,5 @@
   <div class="col-md-12">
     <div class="col-md-12">
       <h1>Place an Order</h1>
-      $maybe lol <- lolvar
-        <p>#{lol}
-      $nothing
-        <p>No order
+      $forall (Value key, Value product, Value price) <- rows
+        <p>#{fromSqlKey key} #{product} #{price}

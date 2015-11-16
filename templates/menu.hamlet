@@ -9,22 +9,21 @@
       <div class="list-group menu">
         $forall (category, products) <- rows
           <div class="list-group-item">
-            <h4 class="list-group-item-heading">#{categoryName category}
+            <h4 class="list-group-item-heading">#{category}
 
-          $forall Entity pid product <- products
-            $with key <- fromSqlKey pid
-              <div class="list-group-item product">
-                <div class="container-fluid">
-                  <div class="col-sm-10">
-                    <p>#{productName product} - #{productPrice product}</p>
-                  <div id="product#{key}" class="col-md-2 text-right">
-                    <input type="hidden" class="productId" value="#{key}" />
-                    <input type="hidden" class="productName" value="#{productName product}" />
-                    <input type="hidden" class="productPrice" value="#{productPrice product}" />
-                    <div class="btn-group">
-                      <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, 1)"><div class="glyphicon glyphicon-plus"></div></a>
-                      <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, -1)"><div class="glyphicon glyphicon-minus"></div></a>
-                    <span id="quantity-display-#{key}"></span>
+          $forall (key, product, price) <- products
+            <div class="list-group-item product">
+              <div class="container-fluid">
+                <div class="col-sm-10">
+                  <p>#{product} - #{price}</p>
+                <div id="product#{key}" class="col-md-2 text-right">
+                  <input type="hidden" class="productId" value="#{key}" />
+                  <input type="hidden" class="productName" value="#{product}" />
+                  <input type="hidden" class="productPrice" value="#{price}" />
+                  <div class="btn-group">
+                    <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, 1)"><div class="glyphicon glyphicon-plus"></div></a>
+                    <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, -1)"><div class="glyphicon glyphicon-minus"></div></a>
+                  <span id="quantity-display-#{key}"></span>
 
     <div class="col-md-3">
       <div class="affix basket-container">
