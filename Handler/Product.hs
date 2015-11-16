@@ -2,15 +2,20 @@
 module Handler.Product where
 
 import Import hiding (Value, on, (==.))
-import Database.Persist.Sql (toSqlKey)
 import Database.Esqueleto
 
-form :: OptionList CategoryId -> Form Product
-form cats = renderDivs $ Product
-    <$> areq (selectField (return cats)) "Category" Nothing
+form :: Form Product
+form = renderDivs $ Product
+    <$> areq (selectField queryCategoryList) "Category" Nothing
     <*> areq textField "Name" Nothing
     <*> areq textField "Description" Nothing
     <*> areq moneyField "Price" Nothing
+
+cform :: Form Category
+cform = renderDivs $ Category
+    <$> lift getDeployment
+    <*> areq textField "Name" Nothing
+    <*> areq intField "Order" Nothing
 
 queryProudctList :: Handler [(Value Text, Value Money, Value Text)]
 queryProudctList = do
@@ -24,24 +29,23 @@ queryProudctList = do
             , c ^. CategoryName
             )
 
-queryCategoryList :: Handler [(Value Text, Value CategoryId)]
+queryCategoryList :: Handler (OptionList CategoryId)
 queryCategoryList = do
     d <- getDeployment
-    runDB $ select $ from $ \c -> do
+    cs <- runDB $ select $ from $ \c -> do
         where_ (c ^. CategoryDeployment ==. (val d))
         return (c ^. CategoryName, c ^. CategoryId)
+    optionsPairs $ fmap (\(a, b) -> (unValue a, unValue b)) cs
 
 getProductR :: Handler Html
 getProductR = do
-    deployment <- getDeployment
     ps <- queryProudctList
     defaultLayout $(widgetFile "product-list")
 
 getProductNewR :: Handler Html
 getProductNewR = do
-    cs <- queryCategoryList
-    cs' <- optionsPairs $ fmap (\(a, b) -> (unValue a, unValue b)) cs
-    ((result, widget), enc) <- runFormPost $ form cs'
+    ((result, widget), enc) <- runFormPost $ form
+    (cwidget, enc) <- generateFormPost cform
     defaultLayout $(widgetFile "product-edit")
 
 postProductNewR :: Handler Html
