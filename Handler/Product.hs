@@ -20,7 +20,7 @@ cform = renderDivs $ Category
 queryProudctList :: Handler [(Value Text, Value Money, Value Text)]
 queryProudctList = do
     d <- getDeployment
-    runDB $ select $ from $ \(c `LeftOuterJoin` p) -> do
+    runDB $ select $ from $ \(c `InnerJoin` p) -> do
         on (c ^. CategoryId ==. p ^. ProductCategory)
         where_ (c ^. CategoryDeployment ==. (val d))
         return
@@ -45,8 +45,13 @@ getProductR = do
 getProductNewR :: Handler Html
 getProductNewR = do
     ((result, widget), enc) <- runFormPost $ form
-    (cwidget, enc) <- generateFormPost cform
-    defaultLayout $(widgetFile "product-edit")
+    case result of
+        FormSuccess p -> addProduct p >> redirect ProductR
+        _ -> defaultLayout $(widgetFile "product-edit")
+  where
+    addProduct p = do
+        _ <- runDB $ insert p
+        setMessage "Created new product"
 
 postProductNewR :: Handler Html
 postProductNewR = getProductNewR

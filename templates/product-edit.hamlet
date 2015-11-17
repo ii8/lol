@@ -2,5 +2,6 @@
   <div class="col-md-12">
     <h1>Manage Products</h1>
 
-    ^{widget}
-    ^{cwidget}
+    <form method=post action=@{ProductNewR} enctype=#{enc}>
+      ^{widget}
+      <input type=submit value="New Product">

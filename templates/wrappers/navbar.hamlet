@@ -21,4 +21,6 @@
                 <li><a href="@{AuthR LogoutR}">Logout</a></li>
               $nothing
                 <li><a href="@{AuthR LoginR}">Login</a></li>
+        $maybe msg <- mmsg
+          <h2>#{msg}
 ^{w}

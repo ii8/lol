@@ -1,13 +1,11 @@
 
-module Import.Money (Money(..), moneyField) where
+module Import.Money (Money(..), moneyField, parseMoney, renderMoney) where
 
 import ClassyPrelude.Yesod
 import Data.Char (isDigit)
-import Text.Read (read)
-import Data.List (tail)
-import qualified Data.Text as T
 import Database.Persist.Sql (PersistFieldSql(..))
 import Text.Blaze (ToMarkup(..))
+import qualified Data.Attoparsec.Text as AP
 
 newtype Money = Money Int
 
@@ -19,39 +17,59 @@ instance Num Money where
     fromInteger a = Money (fromInteger a * 100)
     negate (Money a) = Money (negate a)
 
-readMoney :: String -> Money
-readMoney a = Money $ fst $ (read a :: (Int, String))
-
-dot :: Money -> Text
-dot (Money m) = let s = show m in pack $ cat $ splitAt (length s - 2) s
+renderMoney :: Money -> Text
+renderMoney (Money m) = let s = show m in pack $ cat $ splitAt (length s - 2) s
   where cat (a, b) = a ++ "." ++ b
+
+parseMoney' :: Text -> Either FormMessage Money
+parseMoney' s = case result $ AP.parse p s of
+    Just a -> Right $ Money a
+    Nothing -> Left $ MsgInvalidNumber "Please enter a valid monetary value, eg: 12.50"
+  where
+    p :: AP.Parser Int
+    p = do
+        a <- AP.takeWhile isDigit
+        b <- AP.option ("00" :: Text) q
+        _ <- AP.endOfInput
+        return $ parseInt (a <> b)
+    q :: AP.Parser Text
+    q = do
+        _ <- AP.char '.'
+        b <- AP.digit
+        c <- AP.digit
+        return $ pack [b, c]
+    parseInt :: Text -> Int
+    parseInt str = case result $ AP.parse (AP.signed AP.decimal) str of
+        Just a -> a
+        Nothing -> error $ "parseMoney is broken: " ++ (unpack str)
+    result :: AP.Result r -> Maybe r
+    result (AP.Fail _ _ _) = Nothing
+    result (AP.Partial c) = result (c "")
+    result (AP.Done _ r) = Just r
+
+parseMoney :: Text -> Maybe Money
+parseMoney s = case parseMoney' s of
+    Right a -> Just a
+    Left _ -> Nothing
 
 instance PersistField Money where
     toPersistValue (Money i) = PersistInt64 $ fromIntegral i
     fromPersistValue (PersistInt64 i) = Right $ Money $ fromIntegral i
     fromPersistValue (PersistDouble i) = Right $ Money (truncate i :: Int) -- oracle, what a shit database
-    fromPersistValue x = Left $ T.pack $ "int Expected Integer, received: " ++ show x
+    fromPersistValue x = Left $ pack $ "int Expected Integer, received: " ++ show x
 
 instance PersistFieldSql Money where
     sqlType _ = SqlInt64
 
 instance ToMarkup Money where
-    toMarkup a = "£" ++ (toMarkup (dot a))
+    toMarkup a = "£" ++ (toMarkup (renderMoney a))
 
 moneyField :: Monad m => RenderMessage (HandlerSite m) FormMessage => Field m Money
 moneyField = Field { fieldParse = parse, fieldView = view, fieldEnctype = UrlEncoded }
   where
-    parse = parseHelper $ \s -> case (\(a, b) -> (unpack a, tail $ unpack b)) $ T.breakOn "." s of
-        (xs, [x, y]) -> if all isDigit (x:y:xs)
-            then Right $ readMoney xs * 100 + readMoney [x, y]
-            else Left err
-        (xs, []) -> if all isDigit xs
-            then Right $ readMoney xs * 100
-            else Left err
-        _ -> Left err
+    parse = parseHelper parseMoney'
     view myid name attrs val req = toWidget [whamlet|
-<input type="number" id=#{myid} name=#{name} *{attrs} :req:required value="#{showVal val}">
+<input type="number" step="0.01" id=#{myid} name=#{name} *{attrs} :req:required value="#{showVal val}">
 |]
-    showVal = either id dot
-    err = MsgInvalidEntry "Invalid monetary value"
+    showVal = either id renderMoney
 

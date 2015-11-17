@@ -66,6 +66,7 @@ getDeployment = do
 wrap :: Widget -> Text -> Widget
 wrap w "navbar" = do
     maid <- handlerToWidget maybeAuthId
+    mmsg <- getMessage
     manager <- handlerToWidget $ checkLevel userManager
     $(widgetFile "wrappers/navbar")
 wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
