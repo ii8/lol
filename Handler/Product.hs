@@ -1,30 +1,29 @@
 
 module Handler.Product where
 
-import Import hiding (Value, on, (==.))
+import Import hiding (Value, on, (==.), (=.), update)
 import Database.Esqueleto
 
-form :: Form Product
-form = renderDivs $ Product
-    <$> areq (selectField queryCategoryList) "Category" Nothing
-    <*> areq textField "Name" Nothing
-    <*> areq textField "Description" Nothing
-    <*> areq moneyField "Price" Nothing
+queryProduct :: ProductId -> Handler (Maybe Product)
+queryProduct key = do
+    d <- getDeployment
+    ps <- runDB $ select $ from $ \(c `InnerJoin` p) -> do
+        on (c ^. CategoryId ==. p ^. ProductCategory)
+        where_ (c ^. CategoryDeployment ==. (val d) &&. p ^. ProductId ==. (val key))
+        return p
+    return $ case ps of
+        ((Entity _ p):_) -> Just p
+        [] -> Nothing
 
-cform :: Form Category
-cform = renderDivs $ Category
-    <$> lift getDeployment
-    <*> areq textField "Name" Nothing
-    <*> areq intField "Order" Nothing
-
-queryProudctList :: Handler [(Value Text, Value Money, Value Text)]
+queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text)]
 queryProudctList = do
     d <- getDeployment
     runDB $ select $ from $ \(c `InnerJoin` p) -> do
         on (c ^. CategoryId ==. p ^. ProductCategory)
         where_ (c ^. CategoryDeployment ==. (val d))
         return
-            ( p ^. ProductName
+            ( p ^. ProductId
+            , p ^. ProductName
             , p ^. ProductPrice
             , c ^. CategoryName
             )
@@ -37,6 +36,19 @@ queryCategoryList = do
         return (c ^. CategoryName, c ^. CategoryId)
     optionsPairs $ fmap (\(a, b) -> (unValue a, unValue b)) cs
 
+form :: Maybe Product -> Form Product
+form p = renderDivs $ Product
+    <$> areq (selectField queryCategoryList) "Category" (productCategory <$> p)
+    <*> areq textField "Name" (productName <$> p)
+    <*> areq textField "Description" (productDescription <$> p)
+    <*> areq moneyField "Price" (productPrice <$> p)
+
+cform :: Form Category
+cform = renderDivs $ Category
+    <$> lift getDeployment
+    <*> areq textField "Name" Nothing
+    <*> areq intField "Order" Nothing
+
 getProductR :: Handler Html
 getProductR = do
     ps <- queryProudctList
@@ -44,20 +56,30 @@ getProductR = do
 
 getProductNewR :: Handler Html
 getProductNewR = do
-    ((result, widget), enc) <- runFormPost $ form
+    ((result, widget), enc) <- runFormPost $ form Nothing
     case result of
-        FormSuccess p -> addProduct p >> redirect ProductR
-        _ -> defaultLayout $(widgetFile "product-edit")
-  where
-    addProduct p = do
-        _ <- runDB $ insert p
-        setMessage "Created new product"
+        FormSuccess p -> do
+            _ <- runDB $ insert p
+            setMessage "Created new product"
+            redirect ProductR
+        _ -> defaultLayout $(widgetFile "product-new")
 
 postProductNewR :: Handler Html
 postProductNewR = getProductNewR
 
 getProductEditR :: Key Product -> Handler Html
-getProductEditR p = notFound
+getProductEditR key = do
+    mp <- queryProduct key
+    case mp of
+        Nothing -> notFound
+        old -> do
+            ((result, widget), enc) <- runFormPost $ form old
+            case result of
+                FormSuccess new -> do
+                    runDB $ replace key new
+                    setMessage "Product Updated"
+                    redirect ProductR
+                _ -> defaultLayout $(widgetFile "product-edit")
 
 postProductEditR :: Key Product -> Handler Html
-postProductEditR p = notFound
+postProductEditR key = getProductEditR key

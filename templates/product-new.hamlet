@@ -2,6 +2,6 @@
   <div class="col-md-12">
     <h1>Manage Products</h1>
 
-    <form method=post action=@{ProductEditR key} enctype=#{enc}>
+    <form method=post action=@{ProductNewR} enctype=#{enc}>
       ^{widget}
-      <input type=submit value="Save changes">
+      <input type=submit value="New Product">
