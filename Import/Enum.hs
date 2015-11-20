@@ -3,23 +3,13 @@ module Import.Enum where
 
 import Import.Base
 
-userCustomer :: Int
-userCustomer = 1
+data UserType = Customer | Manager | Admin
+    deriving (Show, Read, Eq, Ord)
 
-userManager :: Int
-userManager = 2
+derivePersistField "UserType"
 
-userAdmin :: Int
-userAdmin = 3
+data PieceDataType = Plain | Reference | Markup | Link
+    deriving (Show, Read, Eq)
 
-dataPlain :: Int
-dataPlain = 1
+derivePersistField "PieceDataType"
 
-dataPiece :: Int
-dataPiece = 2
-
-dataMarkup :: Int
-dataMarkup = 3
-
-dataLink :: Int
-dataLink = 4

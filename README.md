@@ -10,7 +10,7 @@ create database lol;
 insert into `deployment` set `name` = "test", `domain` = "localhost", `wrapper` = "navbar";
 insert into `piece` set `name` = "test";
 insert into `page` set `deployment` = (select `id` from `deployment` where `domain` = "localhost"), `name` = "home", `piece` = 1;
-insert into `piece_data` set `piece` = 1, `key` = 'mainbox', `value` = "Hello I am custom page data", `type` = 1;
+insert into `piece_data` set `piece` = 1, `key` = "mainbox", `value` = "Hello I am custom page data", `type` = "Plain";
 ```
 
 pieces are widgets but I did not want to call them widget because thats in use by yesod already.

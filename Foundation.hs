@@ -67,7 +67,7 @@ wrap :: Widget -> Text -> Widget
 wrap w "navbar" = do
     maid <- handlerToWidget maybeAuthId
     mmsg <- getMessage
-    manager <- handlerToWidget $ checkLevel userManager
+    manager <- handlerToWidget $ checkLevel Manager
     $(widgetFile "wrappers/navbar")
 wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 
@@ -118,8 +118,8 @@ instance Yesod App where
     authRoute _ = Just $ AuthR LoginR
 
     isAuthorized route _
-        | "admin" `member` routeAttrs route = checkLevel' userAdmin
-        | "manager" `member` routeAttrs route = checkLevel' userManager
+        | "admin" `member` routeAttrs route = checkLevel' Admin
+        | "manager" `member` routeAttrs route = checkLevel' Manager
         | otherwise = return Authorized
 
     -- This function creates static content files in the static folder
@@ -189,7 +189,7 @@ instance YesodAuth App where
     --authHttpManager = getHttpManager
     authHttpManager = error "authHttpManager"
 
-checkLevel' :: Int -> Handler AuthResult
+checkLevel' :: UserType -> Handler AuthResult
 checkLevel' level = do
     maid <- maybeAuthId
     case maid of
@@ -204,7 +204,7 @@ checkLevel' level = do
                 then return Authorized
                 else return $ Unauthorized "Sorry, ur under 9000"
 
-checkLevel :: Int -> Handler Bool
+checkLevel :: UserType -> Handler Bool
 checkLevel level = checkLevel' level >>= \a -> case a of
     Authorized -> return True
     _ -> return False
@@ -223,7 +223,7 @@ instance YesodAuthEmail App where
 
     addUnverified email verkey = do
         d <- getDeployment
-        runDB $ insert $ User d email Nothing userCustomer "" "" (Just verkey) False
+        runDB $ insert $ User d email Nothing Customer "" "" (Just verkey) False
 
     sendVerifyEmail email _ verurl = liftIO $ Mail.renderSendMail $ Mail.simpleMail'
         (Mail.Address Nothing email)

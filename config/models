@@ -13,7 +13,7 @@ Piece
     name Text
 PieceData
     piece PieceId
-    type Int
+    type PieceDataType
     key Text
     value Text
     UniquePieceData piece key
@@ -21,7 +21,7 @@ User
     deployment DeploymentId
     email Text
     password Text Maybe
-    type Int
+    type UserType
     first Text
     last Text
     verkey Text Maybe
