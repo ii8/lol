@@ -13,8 +13,10 @@ Piece
     name Text
 PieceData
     piece PieceId
+    type Int
     key Text
     value Text
+    UniquePieceData piece key
 User
     deployment DeploymentId
     email Text

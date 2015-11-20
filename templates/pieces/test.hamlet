@@ -18,3 +18,5 @@
     <h2>Deployment: #{domainName}
 
     <p>The LOL wins every time #{fromSqlKey lolDep} #{fromSqlKey nutherDep}
+
+    <div>^{mainBox}

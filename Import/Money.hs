@@ -1,7 +1,7 @@
 
 module Import.Money (Money(..), moneyField, parseMoney, renderMoney) where
 
-import ClassyPrelude.Yesod
+import Import.Base
 import Data.Char (isDigit)
 import Database.Persist.Sql (PersistFieldSql(..))
 import Text.Blaze (ToMarkup(..))
@@ -22,7 +22,7 @@ renderMoney (Money m) = let s = show m in pack $ cat $ splitAt (length s - 2) s
   where cat (a, b) = a ++ "." ++ b
 
 parseMoney' :: Text -> Either FormMessage Money
-parseMoney' s = case result $ AP.parse p s of
+parseMoney' s = case apresult $ AP.parse p s of
     Just a -> Right $ Money a
     Nothing -> Left $ MsgInvalidNumber "Please enter a valid monetary value, eg: 12.50"
   where
@@ -31,21 +31,13 @@ parseMoney' s = case result $ AP.parse p s of
         a <- AP.takeWhile isDigit
         b <- AP.option ("00" :: Text) q
         _ <- AP.endOfInput
-        return $ parseInt (a <> b)
+        return $ parseInt' (a <> b)
     q :: AP.Parser Text
     q = do
         _ <- AP.char '.'
         b <- AP.digit
         c <- AP.digit
         return $ pack [b, c]
-    parseInt :: Text -> Int
-    parseInt str = case result $ AP.parse (AP.signed AP.decimal) str of
-        Just a -> a
-        Nothing -> error $ "parseMoney is broken: " ++ (unpack str)
-    result :: AP.Result r -> Maybe r
-    result (AP.Fail _ _ _) = Nothing
-    result (AP.Partial c) = result (c "")
-    result (AP.Done _ r) = Just r
 
 parseMoney :: Text -> Maybe Money
 parseMoney s = case parseMoney' s of
