@@ -1,8 +1,7 @@
 
 module Handler.Order where
 
-import Import hiding (Value, (==.), on)
-import Database.Esqueleto
+import Import
 
 query :: Handler [(Value ProductId, Value Text, Value Money)]
 query = do

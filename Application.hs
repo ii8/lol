@@ -13,8 +13,7 @@ module Application
     ) where
 
 import Control.Monad.Logger                 (liftLoc, runLoggingT)
-import Database.Persist.MySQL               (createMySQLPool, myConnInfo,
-                                             myPoolSize, runSqlPool)
+import Database.Persist.MySQL               (createMySQLPool, myConnInfo, myPoolSize)
 import Import
 import Language.Haskell.TH.Syntax           (qLocation)
 import Network.Wai.Handler.Warp             (Settings, defaultSettings,

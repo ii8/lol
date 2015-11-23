@@ -3,7 +3,6 @@ module Foundation where
 import Import.Base
 import Import.Enum
 import Model
-import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Jasmine (minifym)
 import Yesod.Auth.Email
 import Yesod.Auth.Message (AuthMessage (InvalidLogin))
@@ -238,16 +237,22 @@ instance YesodAuthEmail App where
          |]
 
     getVerifyKey = runDB . fmap (join . fmap userVerkey) . get
-    setVerifyKey uid key = runDB $ update uid [UserVerkey =. Just key]
+    setVerifyKey uid key = runDB $ update $ \u -> do
+        set u [UserVerkey =. val (Just key)]
+        where_ (u ^. UserId ==. val uid)
     verifyAccount uid = runDB $ do
         mu <- get uid
         case mu of
             Nothing -> return Nothing
             Just _ -> do
-                update uid [UserVerified =. True]
+                update $ \u -> do
+                    set u [UserVerified =. val True]
+                    where_ (u ^. UserId ==. val uid)
                 return $ Just uid
     getPassword = runDB . fmap (join . fmap userPassword) . get
-    setPassword uid pass = runDB $ update uid [UserPassword =. Just pass]
+    setPassword uid pass = runDB $ update $ \u -> do
+        set u [UserPassword =. val (Just pass)]
+        where_ (u ^. UserId ==. val uid)
     getEmailCreds email = getDeployment >>= \d -> runDB $ do
         mu <- getBy $ UniqueUser d email
         case mu of

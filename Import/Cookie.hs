@@ -4,7 +4,6 @@ module Import.Cookie (OrderCookie(..), renderOrder, parseOrder) where
 
 import Import.Base hiding (Value)
 import Model
-import Database.Persist.Sql (fromSqlKey)
 import Data.Aeson.Encode (encodeToTextBuilder)
 import Data.Text.Lazy.Builder (toLazyText)
 import Data.Aeson.Types (Value, Parser, parseMaybe, withObject, withArray)

@@ -1,8 +1,7 @@
 
 module Handler.Product where
 
-import Import hiding (Value, on, (==.), (=.), update)
-import Database.Esqueleto
+import Import
 
 queryProduct :: ProductId -> Handler (Maybe Product)
 queryProduct key = do

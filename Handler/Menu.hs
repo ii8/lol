@@ -1,8 +1,6 @@
 module Handler.Menu where
 
-import Import hiding (Value, (==.), on)
-import Database.Esqueleto
-
+import Import
 
 query :: Handler [(Text, [(Int64, Text, Money)])]
 query = do

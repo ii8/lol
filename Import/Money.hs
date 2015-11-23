@@ -3,7 +3,6 @@ module Import.Money (Money(..), moneyField, parseMoney, renderMoney) where
 
 import Import.Base
 import Data.Char (isDigit)
-import Database.Persist.Sql (PersistFieldSql(..))
 import Text.Blaze (ToMarkup(..))
 import qualified Data.Attoparsec.Text as AP
 
@@ -60,8 +59,8 @@ moneyField :: Monad m => RenderMessage (HandlerSite m) FormMessage => Field m Mo
 moneyField = Field { fieldParse = parse, fieldView = view, fieldEnctype = UrlEncoded }
   where
     parse = parseHelper parseMoney'
-    view myid name attrs val req = toWidget [whamlet|
-<input type="number" step="0.01" id=#{myid} name=#{name} *{attrs} :req:required value="#{showVal val}">
+    view myid name attrs v req = toWidget [whamlet|
+<input type="number" step="0.01" id=#{myid} name=#{name} *{attrs} :req:required value="#{showVal v}">
 |]
     showVal = either id renderMoney
 

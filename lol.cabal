@@ -61,7 +61,7 @@ library
                  , yesod-static                  >= 1.4.0.3    && < 1.6
                  , yesod-form                    >= 1.4.0      && < 1.5
                  , classy-prelude                >= 0.10.2
-                 , classy-prelude-conduit        >= 0.10.2
+                 --, classy-prelude-conduit        >= 0.10.2
                  , classy-prelude-yesod          >= 0.10.2
                  , bytestring                    >= 0.9        && < 0.11
                  , text                          >= 0.11       && < 2.0
@@ -94,6 +94,7 @@ library
                  , blaze-markup
                  , mime-mail
                  , esqueleto
+                 , yesod-persistent
 
 executable         lol
     if flag(library-only)
