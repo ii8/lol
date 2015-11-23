@@ -47,6 +47,7 @@ function _order_mod(rel, p, q)
                 return 0;
             }
             _order_put(cookie);
+            console.log(cookie);
             return c.quantity;
         }
     }

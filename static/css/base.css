@@ -150,3 +150,14 @@ header .logo { font-family: 'Playfair Display', serif; text-align: left; font-si
     border-color: #DDD;
 }
 .navbar-simple .icon-bar{ background: #363636; }
+
+.quantity-input{
+  width: 27px;
+  border-radius: 0;
+  float: left;
+  border: 0;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  height: 30px;
+  padding: 0 5px 0 5px;
+}

@@ -1,7 +1,7 @@
 function menu_mod(product, i)
 {
     quantity = order_mod(product, i);
-    $('#quantity-display-' + product).html(quantity);
+    $('#quantity-display-' + product).val(quantity);
     _update_cart();
 }
 
@@ -13,6 +13,7 @@ function _update_cart()
 
     for(var i = 0; i < cookie.length; i++)
     {
+        $('#quantity-display-' + cookie[i]['product']).val(cookie[i]['quantity']);
         $("#visual-basket").append(
         "<tr><td>"+$("#product"+cookie[i]['product']).find('.productName').val()+"</td>"+
         "<td>"+cookie[i]['quantity']+"</td></tr>"
@@ -23,3 +24,5 @@ function _update_cart()
 $("#CollectDeliver .btn").click( function() {
     $("#CollectDeliver .btn").toggleClass('active');
 });
+
+_update_cart();
