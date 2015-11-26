@@ -12,7 +12,7 @@ Page
     piece PieceId
     UniquePage deployment name
 Piece
-    name Text
+    template Text
 PieceData
     piece PieceId
     type PieceDataType

@@ -52,8 +52,12 @@ newtype CachedDeploymentId key
 getDeployment' :: Handler DeploymentId
 getDeployment' = do
     domain <- runInputGet $ ireq textField "domain"
-    (Entity deployment _) <- runDB $ getBy404 $ UniqueDomain domain
-    return deployment
+    r <- runDB $ select $ from $ \d -> do
+        where_ (d ^. DeploymentDomain ==. val domain)
+        return (d ^. DeploymentId)
+    case r of
+        ((Value key):[]) -> return key
+        _ -> notFound
 
 getDeployment :: Handler DeploymentId
 getDeployment = do
