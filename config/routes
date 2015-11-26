@@ -6,6 +6,7 @@
 
 /menu                   MenuR           GET
 /order                  OrderR          GET POST
+/order/complete         OrderCompleteR  GET
 /product                ProductR        GET      !manager
 /product/new            ProductNewR     GET POST !manager
 !/product/#ProductId    ProductEditR    GET POST !manager

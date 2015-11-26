@@ -10,7 +10,6 @@ import ClassyPrelude         as Import hiding (on, isNothing, groupBy)
 import Yesod.Core            as Import hiding (Header, Value)
 import Yesod.Form            as Import hiding (parseTime)
 import Yesod.Static          as Import
-import Data.Default          as Import (def)
 import Yesod.Persist.Core    as Import
 import Network.HTTP.Client.Conduit as Import
 import Settings              as Import

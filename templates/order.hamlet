@@ -4,3 +4,4 @@
       <h1>Place an Order</h1>
       $forall (Value key, Value product, Value price) <- rows
         <p>#{fromSqlKey key} #{product} #{price}
+      ^{box}

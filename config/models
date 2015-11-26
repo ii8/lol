@@ -2,6 +2,8 @@ Deployment
     name Text
     domain Text
     wrapper Text
+    stripePublic Text
+    stripeSecret Text
     UniqueDeployment name
     UniqueDomain domain
 Page

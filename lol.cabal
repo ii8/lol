@@ -95,6 +95,8 @@ library
                  , mime-mail
                  , esqueleto
                  , yesod-persistent
+                 , stripe-core
+                 , stripe-haskell
 
 executable         lol
     if flag(library-only)

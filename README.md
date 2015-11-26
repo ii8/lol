@@ -7,7 +7,12 @@ set ur stuffs
 ```SQL
 create database lol;
 #run the app so it creates tables
-insert into `deployment` set `name` = "test", `domain` = "localhost", `wrapper` = "navbar";
+insert into `deployment` set
+    `name` = "test",
+    `domain` = "localhost",
+    `wrapper` = "navbar";
+    `stripe_public` = "pk_test_wUAzZy675JJKqVCFMU2FcSBB"
+    `stripe_secret` = "sk_test_cC82zVtq4YT0Y90ZuXesESTX"
 insert into `piece` set `name` = "test";
 insert into `page` set `deployment` = (select `id` from `deployment` where `domain` = "localhost"), `name` = "home", `piece` = 1;
 insert into `piece_data` set `piece` = 1, `key` = "mainbox", `value` = "Hello I am custom page data", `type` = "Plain";

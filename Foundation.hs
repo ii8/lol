@@ -57,6 +57,10 @@ getDeployment' = do
 
 getDeployment :: Handler DeploymentId
 getDeployment = do
+    -- = fmap unCachedDeploymentId
+    -- . cached
+    -- . fmap CachedDeploymentId
+    -- . getDeployment'
     a <- getDeployment'
     let b = return $ CachedDeploymentId a
     c <- cached b
@@ -88,11 +92,13 @@ instance Yesod App where
     defaultLayout widget = do
         -- Can't use getBy404 because the subwidget might be a 404 response already.
         domain <- runInputGet $ ireq textField "domain"
-        wrapper <- runDB $ do
-            d <- getBy $ UniqueDomain domain
-            return $ case d of
-                Just (Entity _ (Deployment _ _ w)) -> w
-                Nothing -> ""
+        wrapper <- do
+            mw <- runDB $ select $ from $ \d -> do
+                where_ (d ^. DeploymentDomain ==. val domain)
+                return (d ^. DeploymentWrapper)
+            return $ case mw of
+                ((Value w):[]) -> w
+                _ -> ""
 
         pc <- widgetToPageContent $ do
             addStylesheet $ StaticR css_bootstrap_css

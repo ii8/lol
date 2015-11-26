@@ -1,0 +1,22 @@
+var handler = StripeCheckout.configure({
+    key: #{toJSON key},
+    image: "@{StaticR img_torii_gate_png}",
+    locale: 'auto',
+    token: function(token) {
+        $("input[name='co-token']").val(token.id);
+        $("#co-form").submit();
+    }
+});
+
+$('#co-submit').on('click', function(e) {
+    handler.open({
+        name: "Checkout",
+        currency: "gbp",
+        amount: #{toJSON amount}
+    });
+    e.preventDefault();
+});
+
+$(window).on('popstate', function() {
+    handler.close();
+});
