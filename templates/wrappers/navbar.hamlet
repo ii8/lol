@@ -7,20 +7,20 @@
         <div class="container-fluid navbar-inner">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
+              <span class="sr-only">Toggle navigation
+              <span class="icon-bar">
+              <span class="icon-bar">
+              <span class="icon-bar">
           <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="@{HomeR}">Home</a></li>
-              <li><a href="@{MenuR}">Menu</a></li>
+              <li><a href="@{HomeR}">Home</a>
+              <li><a href="@{MenuR}">Menu</a>
               $maybe _ <- maid
                 $if manager
-                  <li><a href="@{ProductR}">Manage Products</a></li>
-                <li><a href="@{AuthR LogoutR}">Logout</a></li>
+                  <li><a href="@{ProductR}">Manage Products</a>
+                <li><a href="@{AuthR LogoutR}">Logout</a>
               $nothing
-                <li><a href="@{AuthR LoginR}">Login</a></li>
+                <li><a href="@{AuthR LoginR}">Login</a>
         $maybe msg <- mmsg
           <h2>#{msg}
 ^{w}

@@ -2,4 +2,4 @@
 <a href="@{ProductNewR}">New Product
 
 $forall (Value key, Value product, Value price, Value category) <- ps
-  <p><a href=@{ProductEditR key}>#{product}</a>, #{price}, #{category}</p>
+  <p><a href="@{ProductEditR key}">#{product}</a>, #{price}, #{category}

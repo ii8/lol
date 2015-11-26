@@ -3,12 +3,12 @@
     <div class="col-md-12">
       <h1>Authentic Chinese Food
     <div class="col-md-12">
-      <a href="@{MenuR}">Order</a>
-      <a href="">Book</a>
+      <a href="@{MenuR}">Order
+      <a href="">Book
 
 <div class="container main-container">
   <div class="col-md-12">
-    <h2>About</h2>
+    <h2>About
     <p>The JADE GARDEN Chinese Take Away is a very well estbatlished business, our head chef has#
     over 20 years of experinces, cooking oriental food. Using the finest ingredents, and their#
     country of orgin, we specailise in Pekinese, Cantonese, Szechuan and Chinese meals.

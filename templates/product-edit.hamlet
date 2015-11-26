@@ -1,6 +1,6 @@
 <div class="container main-container begin-template">
   <div class="col-md-12">
-    <h1>Manage Products</h1>
+    <h1>Manage Products
 
     <form method=post action=@{ProductEditR key} enctype=#{enc}>
       ^{widget}

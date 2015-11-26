@@ -1,6 +1,6 @@
 <div class="container main-container">
   <div class="col-md-12">
-    <h1>Menu</h1>
+    <h1>Menu
 
   $if null rows
     <p>No products
@@ -15,23 +15,25 @@
             <div class="list-group-item product">
               <div class="container-fluid">
                 <div class="col-sm-10">
-                  <p>#{product} - #{price}</p>
+                  <p>#{product} - #{price}
                 <div id="product#{key}" class="col-md-2 text-right">
-                  <input type="hidden" class="productId" value="#{key}" />
-                  <input type="hidden" class="productName" value="#{product}" />
-                  <input type="hidden" class="productPrice" value="#{price}" />
+                  <input type="hidden" class="productId" value="#{key}">
+                  <input type="hidden" class="productName" value="#{product}">
+                  <input type="hidden" class="productPrice" value="#{price}">
                   <div class="btn-group">
-                    <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, 1)"><div class="glyphicon glyphicon-plus"></div></a>
-                    <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, -1)"><div class="glyphicon glyphicon-minus"></div></a>
-                  <span id="quantity-display-#{key}"></span>
+                    <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, 1)">
+                      <div class="glyphicon glyphicon-plus">
+                    <a class="btn btn-default btn-xs" onclick="menu_mod(#{key}, -1)">
+                      <div class="glyphicon glyphicon-minus">
+                  <span id="quantity-display-#{key}">
 
     <div class="col-md-3">
       <div class="affix basket-container">
         <div class="padding">
           <h3>Your Order
           <div class="btn-group" id="CollectDeliver">
-            <a class="btn btn-default active">Delivery</a>
-            <a class="btn btn-default">Collection</a>
+            <a class="btn btn-default active">Delivery
+            <a class="btn btn-default">Collection
           <table class="table table-striped">
             <thead>
               <tr>
@@ -42,4 +44,4 @@
               <tr>
                 <th>Total
                 <th>0.00
-          <a href="@{OrderR}" class="btn btn-green">Order Now</a>
+          <a href="@{OrderR}" class="btn btn-green">Order Now
