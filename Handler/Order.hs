@@ -20,6 +20,11 @@ query = do
                 )
         Nothing -> return []
 
+--oform :: Form Order
+--oform = renderDivs $ Order
+--    <$> lift UserId
+--    <*> areq boolField "Deliver" Nothing
+
 queryStripeConfig :: EntityField Deployment Text -> Handler Text
 queryStripeConfig field = do
     did <- getDeployment

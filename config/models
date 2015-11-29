@@ -50,9 +50,9 @@ Category
     order Int
 Order
     user UserId
+    deliver Bool
 OrderLine
     order OrderId
     product ProductId
     price Money
     quantity Int
-

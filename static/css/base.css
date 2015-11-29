@@ -161,3 +161,7 @@ header .logo { font-family: 'Playfair Display', serif; text-align: left; font-si
   height: 30px;
   padding: 0 5px 0 5px;
 }
+
+.login .btn {
+  margin-top: 5px;
+}

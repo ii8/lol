@@ -11,14 +11,19 @@ function _update_cart()
 
     $("#visual-basket").html("");
 
+    lBasketCount = 0;
+
     for(var i = 0; i < cookie.length; i++)
     {
+        lPrice = parseFloat($('#product'+cookie[i]['product']).find('.productPrice').val()) * cookie[i]['quantity'];
+        lBasketCount+= lPrice
         $('#quantity-display-' + cookie[i]['product']).val(cookie[i]['quantity']);
         $("#visual-basket").append(
         "<tr><td>"+$("#product"+cookie[i]['product']).find('.productName').val()+"</td>"+
-        "<td>"+cookie[i]['quantity']+"</td></tr>"
+        "<td>"+lPrice.toFixed(2)+"</td></tr>"
         );
     }
+    $("#basketTotal").html(lBasketCount.toFixed(2));
 }
 
 $("#CollectDeliver .btn").click( function() {
