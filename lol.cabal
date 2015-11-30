@@ -97,6 +97,7 @@ library
                  , yesod-persistent
                  , stripe-core
                  , stripe-haskell
+                 , markdown
 
 executable         lol
     if flag(library-only)

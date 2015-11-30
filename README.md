@@ -10,9 +10,9 @@ create database lol;
 insert into `deployment` set
     `name` = "test",
     `domain` = "localhost",
-    `wrapper` = "navbar";
-    `stripe_public` = "pk_test_wUAzZy675JJKqVCFMU2FcSBB"
-    `stripe_secret` = "sk_test_cC82zVtq4YT0Y90ZuXesESTX"
+    `wrapper` = "navbar",
+    `stripe_public` = "pk_test_wUAzZy675JJKqVCFMU2FcSBB",
+    `stripe_secret` = "sk_test_cC82zVtq4YT0Y90ZuXesESTX";
 insert into `piece` set
     `template` = "test";
 insert into `page` set

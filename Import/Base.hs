@@ -17,8 +17,8 @@ import Settings.StaticFiles  as Import
 import Yesod.Auth            as Import
 import Yesod.Core.Types      as Import (loggerSet)
 import Yesod.Default.Config2 as Import
-import Database.Persist.TH   as Import (derivePersistField)
 import Database.Esqueleto    as Import
+import Data.Default          as Import
 
 import qualified Data.Attoparsec.Text as AP
 

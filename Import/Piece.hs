@@ -5,6 +5,7 @@ import Import.Base
 import Import.Enum
 import Model
 import Foundation
+import Text.Markdown
 
 -- To add a piece template, add hamlet file to templates/pieces
 -- and add a new pattern to this function. The third parameter is the
@@ -45,9 +46,7 @@ renderData parents (Reference, v) = maybe
     (toWidget [hamlet|Bad piece data value|])
     (renderPiece parents . toSqlKey . fromIntegral)
     (parseInt v)
-renderData _ (Markup, v) = toWidget [hamlet|#{v}|]
---renderData _ (Link, v) = let (label, link) = split ";" v in toWidget [hamlet|<a href=#{link}>#{label}|]
-renderData _ (Link, v) = toWidget [hamlet|<a href=#{v}>#{v}|]
+renderData _ (Markup, v) = toWidget [hamlet|#{markdown def (fromStrict v)}|]
 
 renderPiece :: [PieceId] -> PieceId -> Widget
 renderPiece parents key = if key `elem` parents
