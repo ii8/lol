@@ -11,7 +11,7 @@
           <div class="list-group-item">
             <h4 class="list-group-item-heading">#{category}
 
-          $forall (key, product, price) <- products
+          $forall (key, product, price@(Money money)) <- products
             <div class="list-group-item product">
               <div class="container-fluid">
                 <div class="col-sm-10">
@@ -19,7 +19,7 @@
                 <div id="product#{key}" class="col-md-2 text-right">
                   <input type="hidden" class="productId" value="#{key}">
                   <input type="hidden" class="productName" value="#{product}">
-                  <input type="hidden" class="productPrice" value="#{renderMoney price}">
+                  <input type="hidden" class="productPrice" value="#{money}">
                   <div class="btn-group">
                     <a class="btn btn-default btn-sm" onclick="menu_mod(#{key}, 1)"><div class="glyphicon glyphicon-plus"></div></a>
                     <input type="text" readonly="readonly" class="quantity-input" value="0" id="quantity-display-#{key}" />

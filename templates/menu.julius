@@ -5,25 +5,30 @@ function menu_mod(product, i)
     _update_cart();
 }
 
+function _to_pounds(pence)
+{
+    return (pence / 100).toFixed(2);
+}
+
 function _update_cart()
 {
     cookie = order_get_all()
 
     $("#visual-basket").html("");
 
-    lBasketCount = 0;
+    total = 0;
 
     for(var i = 0; i < cookie.length; i++)
     {
-        lPrice = parseFloat($('#product'+cookie[i]['product']).find('.productPrice').val()) * cookie[i]['quantity'];
-        lBasketCount+= lPrice
+        price = $('#product'+cookie[i].product).find('.productPrice').val() * cookie[i].quantity;
+        total += price
         $('#quantity-display-' + cookie[i]['product']).val(cookie[i]['quantity']);
         $("#visual-basket").append(
         "<tr><td>"+$("#product"+cookie[i]['product']).find('.productName').val()+"</td>"+
-        "<td>"+lPrice.toFixed(2)+"</td></tr>"
+        "<td>"+ _to_pounds(price) +"</td></tr>"
         );
     }
-    $("#basketTotal").html(lBasketCount.toFixed(2));
+    $("#basketTotal").html(_to_pounds(total));
 }
 
 $("#CollectDeliver .btn").click( function() {
