@@ -11,6 +11,7 @@ packages:
 extra-deps:
 - stripe-core-2.0.2
 - stripe-http-streams-2.0.2
+- stripe-haskell-2.0.2
 
 # Override default flag values for local packages and extra-deps
 flags:
@@ -30,5 +31,8 @@ flags:
 # arch: x86_64
 
 # Extra directories used by stack for building
-extra-include-dirs: [/opt/local/include]
-# extra-lib-dirs: [/path/to/dir]
+extra-include-dirs:
+# - /opt/local/include
+- /usr/local/opt/openssl/include
+extra-lib-dirs:
+- /usr/local/opt/openssl/lib

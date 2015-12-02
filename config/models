@@ -29,10 +29,10 @@ User
     verkey Text Maybe
     verified Bool
     UniqueUser deployment email
---Customer
-
-Address
+UserAddress
     user UserId
+    address AddressId
+Address
     name Text Maybe
     lineone Text
     linetwo Text Maybe
@@ -49,8 +49,9 @@ Category
     name Text
     order Int
 Order
-    user UserId
-    deliver Bool
+    deployment DeploymentId
+    user UserId Maybe
+    address AddressId Maybe
 OrderLine
     order OrderId
     product ProductId

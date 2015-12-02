@@ -109,7 +109,6 @@ instance Yesod App where
             addStylesheet $ StaticR css_base_css
             addScript $ StaticR js_jquery_1_11_3_min_js
             addScript $ StaticR js_bootstrap_min_js
-            addScript $ StaticR js_order_js
             wrap widget wrapper
         withUrlRenderer [hamlet|
 <!DOCTYPE html>

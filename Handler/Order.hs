@@ -12,7 +12,7 @@ query = do
     case parseOrder =<< cookie of
         Just (OrderCookie cookie') -> runDB $ select $ from $ \(c `InnerJoin` p) -> do
             on (c ^. CategoryId ==. p ^. ProductCategory)
-            where_ ((p ^. ProductId) `in_` (valList $ fmap fst cookie') &&. (val d) ==. c ^. CategoryDeployment)
+            where_ (p ^. ProductId `in_` valList (fmap fst cookie') &&. val d ==. c ^. CategoryDeployment)
             return
                 ( p ^. ProductId
                 , p ^. ProductName
