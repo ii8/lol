@@ -20,8 +20,15 @@ query = do
                 )
         Nothing -> return []
 
---oform :: Form Order
---oform = renderDivs $ Order
+addressForm :: Maybe Address -> Form Address
+addressForm a = renderDivs $ Address
+  <$> aopt textField "Name" (addressName <$> a)
+  <*> areq textField "Address Line 1" (addressLineone <$> a)
+  <*> aopt textField "Address Line 2" (addressLinetwo <$> a)
+  <*> areq textField "Town" (addressTown <$> a)
+  <*> areq textField "County" (addressCounty <$> a)
+  <*> areq textField "Postcode" (addressPostcode <$> a)
+
 --    <$> lift UserId
 --    <*> areq boolField "Deliver" Nothing
 
@@ -44,6 +51,7 @@ checkout (Money amount) = do
 getOrderR :: Handler Html
 getOrderR = do
     rows <- query
+    ((result, widget), enc) <- runFormPost $ addressForm Nothing
     let box = checkout (Money 232)
     defaultLayout $ do
         setTitle "Order"
@@ -54,6 +62,7 @@ postOrderR = do
     token <- runInputPost $ TokenId <$> ireq textField "co-token"
     amount <- runInputPost $ ireq intField "co-amount"
     secret <- queryStripeConfig DeploymentStripeSecret
+    ((result, widget), enc) <- runFormPost $ addressForm Nothing
     let config = StripeConfig . StripeKey . encodeUtf8 $ secret
     result <- liftIO $ stripe config $ createCharge (Amount amount) GBP -&- token
     case result of

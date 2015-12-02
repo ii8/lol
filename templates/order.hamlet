@@ -2,6 +2,7 @@
   <div class="col-md-12">
     <div class="col-md-12">
       <h1>Place an Order
+      ^{widget}
       $forall (Value key, Value product, Value price) <- rows
         <p>#{fromSqlKey key} #{product} #{price}
       ^{box}
