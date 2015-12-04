@@ -2,7 +2,9 @@
   <div class="col-md-12">
     <div class="col-md-12">
       <h1>Place an Order
-      ^{widget}
-      $forall (Value key, Value product, Value price) <- rows
-        <p>#{fromSqlKey key} #{product} #{price}
-      ^{box}
+      $forall (key, product, price, quantity) <- rows
+        <p>#{fromSqlKey key} #{product} #{price} #{quantity}
+      <form id="co-form" action="@{OrderR}" method="POST">
+        ^{addr}
+        ^{co}
+        <button class="btn btn-green" id="co-submit">Buy

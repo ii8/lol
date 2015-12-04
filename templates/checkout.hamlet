@@ -1,5 +1,3 @@
-<form id="co-form" action="@{OrderR}" method="POST">
-  <input type="hidden" name="co-amount" value="#{amount}">
-  <input type="hidden" name="co-token" value="">
+<input type="hidden" name="co-amount" value="#{amount}">
+<input type="hidden" name="co-token" value="">
 
-<button class="btn btn-green" id="co-submit">Buy
