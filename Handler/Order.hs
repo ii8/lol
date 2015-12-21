@@ -30,6 +30,9 @@ query = do
             return $ fmap addq xs
         Nothing -> return []
 
+calculateAmount :: [(ProductId, Text, Money, Int)] -> Money
+calculateAmount = foldr (\(_, _, p, q) t -> p * (Money q) + t) 0
+
 address :: Maybe Address -> AForm Handler Address
 address a = Address
     <$> aopt textField "Name" (addressName <$> a)
@@ -65,11 +68,16 @@ checkout (Money amount) = do
 
 runStripe :: Handler (Either StripeError (StripeReturn CreateCharge))
 runStripe = do
-    token <- runInputPost $ TokenId <$> ireq textField "co-token"
-    amount <- runInputPost $ ireq intField "co-amount"
-    secret <- queryStripeConfig DeploymentStripeSecret
-    let config = StripeConfig . StripeKey . encodeUtf8 $ secret
-    liftIO $ stripe config $ createCharge (Amount amount) GBP -&- token
+    famount <- runInputPost $ ireq intField "co-amount"
+    rows <- query
+    let (Money vamount) = calculateAmount rows
+    if vamount == famount
+        then do
+            token <- runInputPost $ TokenId <$> ireq textField "co-token"
+            secret <- queryStripeConfig DeploymentStripeSecret
+            let config = StripeConfig . StripeKey . encodeUtf8 $ secret
+            liftIO $ stripe config $ createCharge (Amount vamount) GBP -&- token
+        else error "u wot m8" -- TODO: Add "oops prices have changes since you made choice" page
 
 stripeError :: StripeError -> Handler Html
 stripeError err = defaultLayout $ toWidget [whamlet|Error: #{show err}|]
@@ -87,7 +95,7 @@ handleOrder m = do
             case maybe False (== "true") c of
                 True -> return . fst =<< generateFormPost (bothForm Nothing)
                 False -> return . fst =<< generateFormPost (phoneForm Nothing)
-    let co = checkout (Money 232)
+    let co = checkout $ calculateAmount rows
     defaultLayout $ do
         setTitle "Order"
         $(widgetFile "order")
@@ -133,4 +141,5 @@ saveOrder p ma = do
 getOrderCompleteR :: Handler Html
 getOrderCompleteR = do
     deleteCookie "order" "/"
+    deleteCookie "deliver" "/"
     defaultLayout $ setTitle "Thank You" >> toWidget [whamlet|Success|]
