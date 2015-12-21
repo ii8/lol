@@ -36,3 +36,8 @@ $("#CollectDeliver .btn").click( function() {
 });
 
 _update_cart();
+
+function _set_deliver(b)
+{
+    document.cookie="deliver=" + b;
+}

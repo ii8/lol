@@ -5,6 +5,6 @@
       $forall (key, product, price, quantity) <- rows
         <p>#{fromSqlKey key} #{product} #{price} #{quantity}
       <form id="co-form" action="@{OrderR}" method="POST">
-        ^{addr}
+        ^{fw}
         ^{co}
         <button class="btn btn-green" id="co-submit">Buy

@@ -52,6 +52,7 @@ Order
     deployment DeploymentId
     user UserId Maybe
     address AddressId Maybe
+    phone Phone
 OrderLine
     order OrderId
     product ProductId

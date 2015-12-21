@@ -4,6 +4,7 @@ import ClassyPrelude.Yesod
 import Database.Persist.Quasi
 
 import Import.Money
+import Import.Phone
 import Import.Enum
 
 -- You can define all of your database entities in the entities file.

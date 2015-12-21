@@ -30,8 +30,12 @@
         <div class="padding">
           <h3>Your Order
           <div class="btn-group" id="CollectDeliver">
-            <a class="btn btn-default active">Delivery
-            <a class="btn btn-default">Collection
+            $if deliver == True
+              <a class="btn btn-default active" onclick="_set_deliver(true)">Delivery
+              <a class="btn btn-default" onclick="_set_deliver(false)">Collection
+            $else
+              <a class="btn btn-default" onclick="_set_deliver(true)">Delivery
+              <a class="btn btn-default active" onclick="_set_deliver(false)">Collection
           <table class="table table-striped">
             <thead>
               <tr>

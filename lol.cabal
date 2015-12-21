@@ -21,6 +21,7 @@ library
                      Import.Piece
                      Import.Cookie
                      Import.Money
+                     Import.Phone
                      Model
                      Settings
                      Settings.StaticFiles

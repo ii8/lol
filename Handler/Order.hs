@@ -30,14 +30,22 @@ query = do
             return $ fmap addq xs
         Nothing -> return []
 
-addressForm :: Maybe Address -> Form Address
-addressForm a = renderDivs $ Address
+address :: Maybe Address -> AForm Handler Address
+address a = Address
     <$> aopt textField "Name" (addressName <$> a)
     <*> areq textField "Address Line 1" (addressLineone <$> a)
     <*> aopt textField "Address Line 2" (addressLinetwo <$> a)
     <*> areq textField "Town" (addressTown <$> a)
     <*> areq textField "County" (addressCounty <$> a)
     <*> areq textField "Postcode" (addressPostcode <$> a)
+
+bothForm :: Maybe (Address, Phone) -> Form (Address, Phone)
+bothForm m = renderDivs $ (,)
+    <$> address (fst <$> m)
+    <*> areq phoneField "Phone Number" (snd <$> m)
+
+phoneForm :: Maybe Phone -> Form Phone
+phoneForm p = renderDivs $ areq phoneField "Phone Number" p
 
 queryStripeConfig :: EntityField Deployment Text -> Handler Text
 queryStripeConfig field = do
@@ -55,17 +63,6 @@ checkout (Money amount) = do
     key <- handlerToWidget $ queryStripeConfig DeploymentStripePublic
     $(widgetFile "checkout")
 
-handleOrder :: Maybe Widget -> Handler Html
-handleOrder maddr = do
-    rows <- query
-    addr <- case maddr of
-        Just a -> return a
-        Nothing -> return . fst =<< generateFormPost (addressForm Nothing)
-    let co = checkout (Money 232)
-    defaultLayout $ do
-        setTitle "Order"
-        $(widgetFile "order")
-
 runStripe :: Handler (Either StripeError (StripeReturn CreateCharge))
 runStripe = do
     token <- runInputPost $ TokenId <$> ireq textField "co-token"
@@ -80,30 +77,57 @@ stripeError err = defaultLayout $ toWidget [whamlet|Error: #{show err}|]
 getOrderR :: Handler Html
 getOrderR = handleOrder Nothing
 
+handleOrder :: Maybe Widget -> Handler Html
+handleOrder m = do
+    rows <- query
+    fw <- case m of
+        Just a -> return a
+        Nothing -> do
+            c <- lookupCookie "deliver"
+            case maybe False (== "true") c of
+                True -> return . fst =<< generateFormPost (bothForm Nothing)
+                False -> return . fst =<< generateFormPost (phoneForm Nothing)
+    let co = checkout (Money 232)
+    defaultLayout $ do
+        setTitle "Order"
+        $(widgetFile "order")
+
+
 postOrderR :: Handler Html
 postOrderR = do
-    ((fr, aw), _) <- runFormPost $ addressForm Nothing
-    case fr of
-        FormSuccess addr -> do
-            sr <- runStripe
-            case sr of
-                Left err -> stripeError err
-                Right _ -> runDB (insert addr) >>= saveOrder . Just
-        FormMissing -> do
-            sr <- runStripe
-            case sr of
-                Left err -> stripeError err
-                Right _ -> saveOrder Nothing
-        FormFailure _ -> handleOrder (Just aw)
+    c <- lookupCookie "deliver"
+    if maybe False (== "true") c then postOrderDeliver else postOrderCollect
 
-saveOrder :: Maybe AddressId -> Handler Html
-saveOrder ma = do
+postOrderCollect :: Handler Html
+postOrderCollect = do
+    ((fr, fw), _) <- runFormPost $ phoneForm Nothing
+    case fr of
+        FormSuccess phone -> do
+            sr <- runStripe
+            case sr of
+                Left e -> stripeError e
+                Right _ -> saveOrder phone Nothing
+        _ -> handleOrder $ Just fw
+
+postOrderDeliver :: Handler Html
+postOrderDeliver = do
+    ((fr, fw), _) <- runFormPost $ bothForm Nothing
+    case fr of
+        FormSuccess (addr, phone) -> do
+            sr <- runStripe
+            case sr of
+                Left e -> stripeError e
+                Right _ -> runDB (insert addr) >>= saveOrder phone . Just
+        _ -> handleOrder $ Just fw
+
+saveOrder :: Phone -> Maybe AddressId -> Handler Html
+saveOrder p ma = do
     d <- getDeployment
     u <- maybeAuthId
-    o <- runDB $ insert $ Order d u ma
+    o <- runDB $ insert $ Order d u ma p
     ps <- query
-    _ <- forM ps $ \(pid, _, p, q) ->
-        runDB $ insert $ OrderLine o pid p q
+    _ <- forM ps $ \(pid, _, c, q) ->
+        runDB $ insert $ OrderLine o pid c q
     redirect OrderCompleteR
 
 getOrderCompleteR :: Handler Html
