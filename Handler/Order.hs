@@ -1,5 +1,5 @@
 
-module Handler.Order where
+module Handler.Order (getOrderR, postOrderR, getOrderCompleteR) where
 
 import Import
 import Web.Stripe
@@ -79,8 +79,14 @@ runStripe = do
             liftIO $ stripe config $ createCharge (Amount vamount) GBP -&- token
         else error "u wot m8" -- TODO: Add "oops prices have changes since you made choice" page
 
-stripeError :: StripeError -> Handler Html
-stripeError err = defaultLayout $ toWidget [whamlet|Error: #{show err}|]
+handlePayment :: Handler Bool
+handlePayment = lookupCookie "card" >>= \c -> if maybe False (== "true") c
+    then do
+        sr <- runStripe
+        case sr of
+            Left e -> notFound
+            Right _ -> return True
+    else return False
 
 getOrderR :: Handler Html
 getOrderR = handleOrder Nothing
@@ -95,11 +101,16 @@ handleOrder m = do
             case maybe False (== "true") c of
                 True -> return . fst =<< generateFormPost (bothForm Nothing)
                 False -> return . fst =<< generateFormPost (phoneForm Nothing)
-    let co = checkout $ calculateAmount rows
+    c <- lookupCookie "card"
+    let amount@(Money a) = calculateAmount rows
+        co = if maybe False (== "true") c
+            then checkout amount
+            else toWidget [hamlet|
+<input type="hidden" name="co-amount" value="#{a}">
+|]
     defaultLayout $ do
         setTitle "Order"
         $(widgetFile "order")
-
 
 postOrderR :: Handler Html
 postOrderR = do
@@ -111,10 +122,8 @@ postOrderCollect = do
     ((fr, fw), _) <- runFormPost $ phoneForm Nothing
     case fr of
         FormSuccess phone -> do
-            sr <- runStripe
-            case sr of
-                Left e -> stripeError e
-                Right _ -> saveOrder phone Nothing
+            card <- handlePayment
+            saveOrder card False phone Nothing
         _ -> handleOrder $ Just fw
 
 postOrderDeliver :: Handler Html
@@ -122,17 +131,15 @@ postOrderDeliver = do
     ((fr, fw), _) <- runFormPost $ bothForm Nothing
     case fr of
         FormSuccess (addr, phone) -> do
-            sr <- runStripe
-            case sr of
-                Left e -> stripeError e
-                Right _ -> runDB (insert addr) >>= saveOrder phone . Just
+            card <- handlePayment
+            runDB (insert addr) >>= saveOrder card True phone . Just
         _ -> handleOrder $ Just fw
 
-saveOrder :: Phone -> Maybe AddressId -> Handler Html
-saveOrder p ma = do
+saveOrder :: Bool -> Bool -> Phone -> Maybe AddressId -> Handler Html
+saveOrder card deliver p ma = do
     d <- getDeployment
     u <- maybeAuthId
-    o <- runDB $ insert $ Order d u ma p
+    o <- runDB $ insert $ Order d u card deliver False ma p
     ps <- query
     _ <- forM ps $ \(pid, _, c, q) ->
         runDB $ insert $ OrderLine o pid c q
@@ -142,4 +149,5 @@ getOrderCompleteR :: Handler Html
 getOrderCompleteR = do
     deleteCookie "order" "/"
     deleteCookie "deliver" "/"
+    deleteCookie "card" "/"
     defaultLayout $ setTitle "Thank You" >> toWidget [whamlet|Success|]

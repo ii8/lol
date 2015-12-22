@@ -30,12 +30,11 @@
         <div class="padding">
           <h3>Your Order
           <div class="btn-group" id="CollectDeliver">
-            $if deliver == True
-              <a class="btn btn-default active" onclick="_set_deliver(true)">Delivery
-              <a class="btn btn-default" onclick="_set_deliver(false)">Collection
-            $else
-              <a class="btn btn-default" onclick="_set_deliver(true)">Delivery
-              <a class="btn btn-default active" onclick="_set_deliver(false)">Collection
+            <a id="deliver" class="btn btn-default" onclick="_set_deliver(true)">Delivery
+            <a id="collect" class="btn btn-default" onclick="_set_deliver(false)">Collection
+          <div class="btn-group" id="CashCard">
+            <a id="card" class="btn btn-default" onclick="_set_card(true)">Card
+            <a id="cash" class="btn btn-default" onclick="_set_card(false)">Cash
           <table class="table table-striped">
             <thead>
               <tr>

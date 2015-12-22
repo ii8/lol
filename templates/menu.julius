@@ -31,13 +31,53 @@ function _update_cart()
     $("#basketTotal").html(_to_pounds(total));
 }
 
-$("#CollectDeliver .btn").click( function() {
-    $("#CollectDeliver .btn").toggleClass('active');
-});
+function _cookie_get(name)
+{
+    name += '=';
+    var ca = document.cookie.split(';');
+    for(var i=0; i < ca.length; i++) {
+        var c = ca[i];
 
-_update_cart();
+        while(c.charAt(0) == ' ')
+            c = c.substring(1, c.length);
+
+        if(c.indexOf(name) == 0) {
+            var str = c.substring(name.length, c.length);
+            if(str === 'true')
+                return true;
+            return false;
+        }
+    }
+    return false;
+}
 
 function _set_deliver(b)
 {
+    if(b == _cookie_get('deliver'))
+        return;
     document.cookie="deliver=" + b;
+    $("#CollectDeliver .btn").toggleClass('active');
 }
+
+function _set_card(b)
+{
+    if(b == _cookie_get('card'))
+        return;
+    document.cookie="card=" + b;
+    $("#CashCard .btn").toggleClass('active');
+}
+
+$(document).ready(function()
+{
+    _update_cart();
+
+    if(_cookie_get('deliver'))
+        $('#deliver').addClass('active');
+    else
+        $('#collect').addClass('active');
+
+    if(_cookie_get('card'))
+        $('#card').addClass('active');
+    else
+        $('#cash').addClass('active');
+});

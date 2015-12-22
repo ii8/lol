@@ -51,6 +51,9 @@ Category
 Order
     deployment DeploymentId
     user UserId Maybe
+    card Bool
+    deliver Bool
+    complete Bool
     address AddressId Maybe
     phone Phone
 OrderLine
