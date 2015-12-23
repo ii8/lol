@@ -26,10 +26,6 @@ query = do
 getMenuR :: Handler Html
 getMenuR = do
     rows <- query
-    c <- lookupCookie "deliver"
-    let deliver = maybe False (== "true") c
-    c' <- lookupCookie "card"
-    let card = maybe False (== "true") c'
     defaultLayout $ do
         addScript $ StaticR js_order_js
         $(widgetFile "menu")

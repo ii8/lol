@@ -17,8 +17,15 @@ instance Num Money where
     negate (Money a) = Money (negate a)
 
 renderMoney :: Money -> Text
-renderMoney (Money m) = let s = show m in pack $ cat $ splitAt (length s - 2) s
-  where cat (a, b) = a ++ "." ++ b
+renderMoney (Money m) =
+    let s = pack $ show m
+        l = length s
+        cat (a, b) = a <> "." <> b in
+    case l of
+        0 -> "0.00"
+        1 -> "0.0" <> s
+        2 -> "0." <> s
+        _ -> cat $ splitAt (l - 2) s
 
 parseMoney' :: Text -> Either FormMessage Money
 parseMoney' s = case apresult $ AP.parse p s of

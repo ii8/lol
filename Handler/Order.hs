@@ -66,27 +66,29 @@ checkout (Money amount) = do
     key <- handlerToWidget $ queryStripeConfig DeploymentStripePublic
     $(widgetFile "checkout")
 
-runStripe :: Handler (Either StripeError (StripeReturn CreateCharge))
-runStripe = do
+runStripe :: Int -> Handler (Either StripeError (StripeReturn CreateCharge))
+runStripe amount = do
+    token <- runInputPost $ TokenId <$> ireq textField "co-token"
+    secret <- queryStripeConfig DeploymentStripeSecret
+    let config = StripeConfig . StripeKey . encodeUtf8 $ secret
+    liftIO $ stripe config $ createCharge (Amount amount) GBP -&- token
+
+handlePayment :: Handler Bool
+handlePayment = do
     famount <- runInputPost $ ireq intField "co-amount"
     rows <- query
     let (Money vamount) = calculateAmount rows
-    if vamount == famount
+    if vamount == famount && vamount >= 20
         then do
-            token <- runInputPost $ TokenId <$> ireq textField "co-token"
-            secret <- queryStripeConfig DeploymentStripeSecret
-            let config = StripeConfig . StripeKey . encodeUtf8 $ secret
-            liftIO $ stripe config $ createCharge (Amount vamount) GBP -&- token
+            c <- lookupCookie "card"
+            if maybe False (== "true") c
+                then do
+                    sr <- runStripe vamount
+                    case sr of
+                        Left e -> error $ show e
+                        Right _ -> return True
+                else return False
         else error "u wot m8" -- TODO: Add "oops prices have changes since you made choice" page
-
-handlePayment :: Handler Bool
-handlePayment = lookupCookie "card" >>= \c -> if maybe False (== "true") c
-    then do
-        sr <- runStripe
-        case sr of
-            Left e -> notFound
-            Right _ -> return True
-    else return False
 
 getOrderR :: Handler Html
 getOrderR = handleOrder Nothing
@@ -108,9 +110,11 @@ handleOrder m = do
             else toWidget [hamlet|
 <input type="hidden" name="co-amount" value="#{a}">
 |]
-    defaultLayout $ do
-        setTitle "Order"
-        $(widgetFile "order")
+    if a >= 20
+        then defaultLayout $ do
+            setTitle "Order"
+            $(widgetFile "order")
+        else redirect MenuR
 
 postOrderR :: Handler Html
 postOrderR = do
