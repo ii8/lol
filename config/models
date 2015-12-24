@@ -61,3 +61,4 @@ OrderLine
     product ProductId
     price Money
     quantity Int
+    UniqueOrderLine order product

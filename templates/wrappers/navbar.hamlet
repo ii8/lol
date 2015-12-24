@@ -20,11 +20,11 @@
                   <li><a href="@{ProductR}">Manage Products</a>
                 <li><a href="@{AuthR LogoutR}">Logout</a>
               $nothing
-                <li><a href="@{AuthR LoginR}">Login</a></li>
+                <li><a href="@{AuthR LoginR}">Login</a>
 $maybe msg <- mmsg
   <div class="container main-container" style="margin-top: 10px">
     <div class="col-md-12 alert alert-danger" role="alert">
-      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      <span class="sr-only">Error:</span>
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">
+      <span class="sr-only">Error:
       #{msg}
 ^{w}

@@ -9,12 +9,14 @@ var handler = StripeCheckout.configure({
 });
 
 $('#co-submit').on('click', function(e) {
-    handler.open({
-        name: "Checkout",
-        currency: "gbp",
-        amount: #{toJSON amount}
-    });
-    e.preventDefault();
+    if($('#co-form')[0].checkValidity()) {
+        handler.open({
+            name: "Checkout",
+            currency: "gbp",
+            amount: #{toJSON amount}
+        });
+        e.preventDefault();
+    }
 });
 
 $(window).on('popstate', function() {
