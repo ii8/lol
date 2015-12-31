@@ -54,7 +54,8 @@ wipeDB app = runDBWithApp app $ do
                \`domain` = 'localhost',\
                \`wrapper` = 'navbar',\
                \`stripe_public` = 'pk_test_wUAzZy675JJKqVCFMU2FcSBB',\
-               \`stripe_secret` = 'sk_test_cC82zVtq4YT0Y90ZuXesESTX';" []
+               \`stripe_secret` = 'sk_test_cC82zVtq4YT0Y90ZuXesESTX',\
+               \`email` = 'dave@sharklasers.com';" []
     rawExecute "insert into `piece` set \
                \`template` = 'test';" []
     rawExecute "insert into `page` set \

@@ -46,6 +46,7 @@ data AppSettings = AppSettings
     , appMinify                 :: Bool
     -- ^ Minify javascript and css when generating cache
 
+    , appEmail                  :: Text
     -- Example app-specific configuration values.
     , appCopyright              :: Text
     -- ^ Copyright text to appear in the footer of the page
@@ -74,6 +75,7 @@ instance FromJSON AppSettings where
         appSkipCombining          <- o .:? "skip-combining"   .!= defaultDev
         appMinify                 <- o .:? "minify"           .!= (not defaultDev)
 
+        appEmail                  <- o .: "email"
         appCopyright              <- o .: "copyright"
         appAnalytics              <- o .:? "analytics"
 

@@ -233,17 +233,20 @@ instance YesodAuthEmail App where
         d <- getDeployment
         runDB $ insert $ User d email Nothing Customer "" "" (Just verkey) False
 
-    sendVerifyEmail email _ verurl = liftIO $ Mail.renderSendMail $ Mail.simpleMail'
-        (Mail.Address Nothing email)
-        (Mail.Address Nothing "jonathan.landahl@phpartnership.com")
-        "Verify"
-         [stext|
-             Please confirm your email address by clicking on the link below.
+    sendVerifyEmail email _ verurl = do
+        master <- getYesod
+        let masterEmail = appEmail $ appSettings master
+        liftIO $ Mail.renderSendMail $ Mail.simpleMail'
+            (Mail.Address Nothing email)
+            (Mail.Address Nothing masterEmail)
+            "Verify"
+            [stext|
+                Please confirm your email address by clicking on the link below.
 
-             #{verurl}
+                #{verurl}
 
-             Thank you
-         |]
+                Thank you
+            |]
 
     getVerifyKey = runDB . fmap (join . fmap userVerkey) . get
     setVerifyKey uid key = runDB $ update $ \u -> do

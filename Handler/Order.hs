@@ -6,6 +6,9 @@ import Web.Stripe
 import Web.Stripe.Charge
 import Web.Stripe.Error
 
+import qualified Network.Mail.Mime as Mail
+import Text.Shakespeare.Text (stext)
+
 lookupQuantity :: ProductId -> OrderCookie -> Int
 lookupQuantity p (OrderCookie c) = case find ((==) p . fst) c >>= return . snd of
     Just a -> a
@@ -154,4 +157,20 @@ getOrderCompleteR = do
     deleteCookie "order" "/"
     deleteCookie "deliver" "/"
     deleteCookie "card" "/"
+    master <- getYesod
+    d <- getDeployment
+    r <- runDB $ select $ from $ \t -> do
+        where_ $ t ^. DeploymentId ==. val d
+        return $ t ^. DeploymentEmail
+    let masterEmail = appEmail $ appSettings master
+        email = case r of
+            ((Value m):[]) -> m
+            _ -> error "getOrderCompleteR"
+    liftIO $ Mail.renderSendMail $ Mail.simpleMail'
+        (Mail.Address Nothing email)
+        (Mail.Address Nothing masterEmail)
+        "New Order"
+        [stext|
+            There is new orderz!!
+        |]
     defaultLayout $ setTitle "Thank You" >> toWidget [whamlet|Success|]

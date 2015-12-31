@@ -4,6 +4,7 @@ Deployment
     wrapper Text
     stripePublic Text
     stripeSecret Text
+    email Text
     UniqueDeployment name
     UniqueDomain domain
 Page
