@@ -45,30 +45,41 @@ mkYesodData "App" $(parseRoutesFile "config/routes")
 -- | A convenient synonym for creating forms.
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
-newtype CachedDeploymentId key
-    = CachedDeploymentId { unCachedDeploymentId :: key }
+newtype CachedDeployment d
+    = CachedDeployment { unCachedDeployment :: d }
     deriving Typeable
 
-getDeployment' :: Handler DeploymentId
-getDeployment' = do
-    domain <- runInputGet $ ireq textField "domain"
-    r <- runDB $ select $ from $ \d -> do
-        where_ (d ^. DeploymentDomain ==. val domain)
-        return (d ^. DeploymentId)
-    case r of
-        ((Value key):[]) -> return key
-        _ -> notFound
+getDeployment' :: Handler (Maybe (Entity Deployment))
+getDeployment' =
+    fmap unCachedDeployment $ cached $ fmap CachedDeployment deployment
+  where
+    deployment = runDB . getBy . UniqueDomain =<< domain
+    domain = do
+        r <- waiRequest
+        return $ maybe ""
+            (takeWhile (/= ':') . decodeUtf8)
+            (lookup "host" . Wai.requestHeaders $ r)
 
-getDeployment :: Handler DeploymentId
+getDeployment :: Handler Deployment
 getDeployment = do
-    -- = fmap unCachedDeploymentId
-    -- . cached
-    -- . fmap CachedDeploymentId
-    -- . getDeployment'
-    a <- getDeployment'
-    let b = return $ CachedDeploymentId a
-    c <- cached b
-    return $ unCachedDeploymentId c
+    d <- getDeployment'
+    case d of
+        Just (Entity _ e) -> return e
+        Nothing -> notFound
+
+getDeploymentSafe :: Handler (Maybe Deployment)
+getDeploymentSafe = do
+    d <- getDeployment'
+    return $ case d of
+        Just (Entity _ e) -> Just e
+        Nothing -> Nothing
+
+getDeploymentId :: Handler DeploymentId
+getDeploymentId = do
+    d <- getDeployment'
+    case d of
+        Just (Entity k _) -> return k
+        Nothing -> notFound
 
 wrap :: Widget -> Text -> Widget
 wrap w "navbar" = do
@@ -94,15 +105,12 @@ instance Yesod App where
         "config/client_session_key.aes"
 
     defaultLayout widget = do
-        -- Can't use getBy404 because the subwidget might be a 404 response already.
-        domain <- runInputGet $ ireq textField "domain"
+        -- Need getDeploymentSafe because the subwidget might be a 404 response already.
         wrapper <- do
-            mw <- runDB $ select $ from $ \d -> do
-                where_ (d ^. DeploymentDomain ==. val domain)
-                return (d ^. DeploymentWrapper)
-            return $ case mw of
-                ((Value w):[]) -> w
-                _ -> ""
+            md <- getDeploymentSafe
+            return $ case md of
+                Just d -> deploymentWrapper d
+                Nothing -> ""
 
         pc <- widgetToPageContent $ do
             addStylesheet $ StaticR css_bootstrap_css
@@ -179,7 +187,7 @@ instance YesodAuth App where
     -- Maybe use ultimate destination later
     redirectToReferer _ = False
 
-    authenticate creds = getDeployment >>= \d -> runDB $ do
+    authenticate creds = getDeploymentId >>= \d -> runDB $ do
         x <- getBy $ UniqueUser d (credsIdent creds)
         return $ case x of
             Just (Entity uid _) -> Authenticated uid
@@ -230,7 +238,7 @@ instance YesodAuthEmail App where
     afterPasswordRoute _ = HomeR
 
     addUnverified email verkey = do
-        d <- getDeployment
+        d <- getDeploymentId
         runDB $ insert $ User d email Nothing Customer "" "" (Just verkey) False
 
     sendVerifyEmail email _ verurl = do
@@ -265,7 +273,7 @@ instance YesodAuthEmail App where
     setPassword uid pass = runDB $ update $ \u -> do
         set u [UserPassword =. val (Just pass)]
         where_ (u ^. UserId ==. val uid)
-    getEmailCreds email = getDeployment >>= \d -> runDB $ do
+    getEmailCreds email = getDeploymentId >>= \d -> runDB $ do
         mu <- getBy $ UniqueUser d email
         case mu of
             Nothing -> return Nothing

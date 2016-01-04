@@ -14,9 +14,9 @@ import Text.Markdown
 -- widget ready to be embeded in hamlet.
 renderPiece' :: [PieceId] -> PieceId -> Text -> Widget
 renderPiece' parents key "test" = do
-    domainName <- runInputGet $ ireq textField "domain"
-    lolDep <- handlerToWidget getDeployment
-    nutherDep <- handlerToWidget getDeployment
+    domainName <- handlerToWidget $ deploymentDomain <$> getDeployment
+    lolDep <- handlerToWidget getDeploymentId
+    nutherDep <- handlerToWidget getDeploymentId
     let mainBox = getData parents key "mainbox"
     $(widgetFile "pieces/test")
 renderPiece' ps key "laxus" = do

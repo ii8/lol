@@ -16,7 +16,7 @@ lookupQuantity p (OrderCookie c) = case find ((==) p . fst) c >>= return . snd o
 
 query :: Handler [(ProductId, Text, Money, Int)]
 query = do
-    d <- getDeployment
+    d <- getDeploymentId
     cookie <- lookupCookie "order"
     case parseOrder =<< cookie of
         Just oc@(OrderCookie cookie') -> do
@@ -53,26 +53,16 @@ bothForm m = renderDivs $ (,)
 phoneForm :: Maybe Phone -> Form Phone
 phoneForm p = renderDivs $ areq phoneField "Phone Number" p
 
-queryStripeConfig :: EntityField Deployment Text -> Handler Text
-queryStripeConfig field = do
-    did <- getDeployment
-    result <- runDB $ select $ from $ \d -> do
-        where_ (d ^. DeploymentId ==. val did)
-        return (d ^. field)
-    return $ case result of
-        ((Value key):[]) -> key
-        _ -> error "queryStripeConfig"
-
 checkout :: Money -> Widget
 checkout (Money amount) = do
     addScriptRemote "https://checkout.stripe.com/checkout.js"
-    key <- handlerToWidget $ queryStripeConfig DeploymentStripePublic
+    key <- handlerToWidget $ deploymentStripePublic <$> getDeployment
     $(widgetFile "checkout")
 
 runStripe :: Int -> Handler (Either StripeError (StripeReturn CreateCharge))
 runStripe amount = do
     token <- runInputPost $ TokenId <$> ireq textField "co-token"
-    secret <- queryStripeConfig DeploymentStripeSecret
+    secret <- deploymentStripeSecret <$> getDeployment
     let config = StripeConfig . StripeKey . encodeUtf8 $ secret
     liftIO $ stripe config $ createCharge (Amount amount) GBP -&- token
 
@@ -144,7 +134,7 @@ postOrderDeliver = do
 
 saveOrder :: Bool -> Bool -> Phone -> Maybe AddressId -> Handler Html
 saveOrder card deliver p ma = do
-    d <- getDeployment
+    d <- getDeploymentId
     u <- maybeAuthId
     o <- runDB $ insert $ Order d u card deliver False ma p
     ps <- query
@@ -157,15 +147,8 @@ getOrderCompleteR = do
     deleteCookie "order" "/"
     deleteCookie "deliver" "/"
     deleteCookie "card" "/"
-    master <- getYesod
-    d <- getDeployment
-    r <- runDB $ select $ from $ \t -> do
-        where_ $ t ^. DeploymentId ==. val d
-        return $ t ^. DeploymentEmail
-    let masterEmail = appEmail $ appSettings master
-        email = case r of
-            ((Value m):[]) -> m
-            _ -> error "getOrderCompleteR"
+    email <- deploymentEmail <$> getDeployment
+    masterEmail <- appEmail . appSettings <$> getYesod
     liftIO $ Mail.renderSendMail $ Mail.simpleMail'
         (Mail.Address Nothing email)
         (Mail.Address Nothing masterEmail)

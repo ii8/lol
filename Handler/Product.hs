@@ -5,7 +5,7 @@ import Import
 
 queryProduct :: ProductId -> Handler (Maybe Product)
 queryProduct key = do
-    d <- getDeployment
+    d <- getDeploymentId
     ps <- runDB $ select $ from $ \(c `InnerJoin` p) -> do
         on (c ^. CategoryId ==. p ^. ProductCategory)
         where_ (c ^. CategoryDeployment ==. (val d) &&. p ^. ProductId ==. (val key))
@@ -16,7 +16,7 @@ queryProduct key = do
 
 queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text)]
 queryProudctList = do
-    d <- getDeployment
+    d <- getDeploymentId
     runDB $ select $ from $ \(c `InnerJoin` p) -> do
         on (c ^. CategoryId ==. p ^. ProductCategory)
         where_ (c ^. CategoryDeployment ==. (val d))
@@ -29,7 +29,7 @@ queryProudctList = do
 
 queryCategoryList :: Handler (OptionList CategoryId)
 queryCategoryList = do
-    d <- getDeployment
+    d <- getDeploymentId
     cs <- runDB $ select $ from $ \c -> do
         where_ (c ^. CategoryDeployment ==. (val d))
         return (c ^. CategoryName, c ^. CategoryId)
@@ -44,7 +44,7 @@ form p = renderDivs $ Product
 
 cform :: Form Category
 cform = renderDivs $ Category
-    <$> lift getDeployment
+    <$> lift getDeploymentId
     <*> areq textField "Name" Nothing
     <*> areq intField "Order" Nothing
 

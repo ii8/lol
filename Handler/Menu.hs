@@ -4,7 +4,7 @@ import Import
 
 query :: Handler [(Text, [(Int64, Text, Money)])]
 query = do
-    d <- getDeployment
+    d <- getDeploymentId
     rows <- runDB $ select $ from $ \(c `InnerJoin` p) -> do
         on (c ^. CategoryId ==. p ^. ProductCategory)
         where_ (c ^. CategoryDeployment ==. (val d))
