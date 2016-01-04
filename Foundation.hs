@@ -42,7 +42,6 @@ instance HasHttpManager App where
 -- type Widget = WidgetT App IO ()
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
--- | A convenient synonym for creating forms.
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
 newtype CachedDeployment d
@@ -89,17 +88,11 @@ wrap w "navbar" = do
     $(widgetFile "wrappers/navbar")
 wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 
--- Please see the documentation for the Yesod typeclass. There are a number
--- of settings which can be configured by overriding methods here.
 instance Yesod App where
-    -- Controls the base of generated URLs. For more information on modifying,
-    -- see: https://github.com/yesodweb/yesod/wiki/Overriding-approot
     approot = ApprootRequest $ \_ r -> maybe ""
         (mappend ("http://" :: Text) . decodeUtf8)
         (lookup "host" . Wai.requestHeaders $ r)
 
-    -- Store session data on the client in encrypted cookies,
-    -- default session idle timeout is 120 minutes
     makeSessionBackend _ = Just <$> defaultClientSessionBackend
         120    -- timeout in minutes
         "config/client_session_key.aes"
@@ -207,18 +200,12 @@ instance YesodAuth App where
 
 checkLevel' :: UserType -> Handler AuthResult
 checkLevel' level = do
-    maid <- maybeAuthId
-    case maid of
+    mu <- maybeAuth
+    case mu of
         Nothing -> return AuthenticationRequired
-        Just aid -> checkUser aid
-  where
-    checkUser key = do
-        user <- runDB $ get key
-        case user of
-            Nothing -> return AuthenticationRequired
-            Just u -> if userType u >= level
-                then return Authorized
-                else return $ Unauthorized "Sorry, ur under 9000"
+        Just (Entity _ u) -> if userType u >= level
+            then return Authorized
+            else return $ Unauthorized "Sorry, ur under 9000"
 
 checkLevel :: UserType -> Handler Bool
 checkLevel level = checkLevel' level >>= \a -> case a of
