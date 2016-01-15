@@ -99,6 +99,7 @@ library
                  , stripe-core
                  , stripe-haskell
                  , markdown
+                 , http-types
 
 executable         lol
     if flag(library-only)

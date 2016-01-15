@@ -9,7 +9,8 @@ import Yesod.Auth.Message (AuthMessage (InvalidLogin))
 import Yesod.Default.Util (addStaticContentExternal)
 import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
-import qualified Network.Wai as Wai
+import Network.Wai (requestHeaderHost, isSecure)
+import Network.HTTP.Types.Status (badRequest400)
 
 import qualified Network.Mail.Mime as Mail
 import Text.Shakespeare.Text (stext)
@@ -55,9 +56,10 @@ getDeployment' =
     deployment = runDB . getBy . UniqueDomain =<< domain
     domain = do
         r <- waiRequest
-        return $ maybe ""
-            (takeWhile (/= ':') . decodeUtf8)
-            (lookup "host" . Wai.requestHeaders $ r)
+        maybe
+            (sendResponseStatus badRequest400 ())
+            (return . takeWhile (/= ':') . decodeUtf8)
+            (requestHeaderHost r)
 
 getDeployment :: Handler Deployment
 getDeployment = do
@@ -90,8 +92,8 @@ wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 
 instance Yesod App where
     approot = ApprootRequest $ \_ r -> maybe ""
-        (mappend ("http://" :: Text) . decodeUtf8)
-        (lookup "host" . Wai.requestHeaders $ r)
+        (mappend (if isSecure r then "https://" else "http://") . decodeUtf8)
+        (requestHeaderHost r)
 
     makeSessionBackend _ = Just <$> defaultClientSessionBackend
         120    -- timeout in minutes
