@@ -4,4 +4,4 @@
 
     <form method=post action=@{ProductEditR key} enctype=#{enc}>
       ^{widget}
-      <input type=submit value="Save changes">
+      <input type="submit" class="btn btn-green" value="Save changes">

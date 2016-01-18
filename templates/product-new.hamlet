@@ -4,4 +4,4 @@
 
     <form method=post action=@{ProductNewR} enctype=#{enc}>
       ^{widget}
-      <input type=submit value="New Product">
+      <input type=submit class="btn btn-green" value="New Product">

@@ -25,10 +25,10 @@ function _update_cart()
         $('#quantity-display-' + cookie[i]['product']).val(cookie[i]['quantity']);
         $("#visual-basket").append(
         "<tr><td>"+$("#product"+cookie[i]['product']).find('.productName').val()+"</td>"+
-        "<td>"+ _to_pounds(price) +"</td></tr>"
+        "<td>&pound;"+ _to_pounds(price) +"</td></tr>"
         );
     }
-    $("#basketTotal").html(_to_pounds(total));
+    $("#basketTotal").html('&pound;'+_to_pounds(total));
 }
 
 function _cookie_get(name)
