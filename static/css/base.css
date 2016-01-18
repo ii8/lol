@@ -27,6 +27,10 @@ header {
 }
 header .logo { font-family: 'Playfair Display', serif; text-align: left; font-size: 40px; font-weight: bold; }
 
+.btn-group-special .btn-group:first-child .btn:first-child{ border-bottom-left-radius: 0; }
+.btn-group-special .btn-group:first-child .btn:last-child{ border-bottom-right-radius: 0; }
+.btn-group-special .btn-group:last-child .btn:first-child{ border-top-left-radius: 0; }
+.btn-group-special .btn-group:last-child .btn:last-child{ border-top-right-radius: 0; }
 
 .main-header {
   padding-top: 300px;

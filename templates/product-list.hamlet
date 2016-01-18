@@ -1,5 +1,14 @@
+<div class="container main-container">
+  <div class="col-md-12">
+    <h1>Manage Products
+    <a class="btn btn-green" href="@{ProductNewR}">New Product
 
-<a href="@{ProductNewR}">New Product
-
-$forall (Value key, Value product, Value price, Value category) <- ps
-  <p><a href="@{ProductEditR key}">#{product}</a>, #{price}, #{category}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name
+          <th>Price
+          <th>Category
+      <tbody>
+        $forall (Value key, Value product, Value price, Value category) <- ps
+          <tr><td><a href="@{ProductEditR key}">#{product}</a></td><td>#{price}</td><td>#{category}</td>

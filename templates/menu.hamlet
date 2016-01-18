@@ -29,12 +29,13 @@
       <div class="affix basket-container">
         <div class="padding">
           <h3>Your Order
-          <div class="btn-group" id="CollectDeliver">
-            <a id="deliver" class="btn btn-default" onclick="_set_deliver(true)">Delivery
-            <a id="collect" class="btn btn-default" onclick="_set_deliver(false)">Collection
-          <div class="btn-group" id="CashCard">
-            <a id="card" class="btn btn-default" onclick="_set_card(true)">Card
-            <a id="cash" class="btn btn-default" onclick="_set_card(false)">Cash
+          <div class="btn-group-special">
+            <div class="btn-group btn-group-justified" id="CollectDeliver">
+              <a id="deliver" class="btn btn-default" onclick="_set_deliver(true)">Delivery
+              <a id="collect" class="btn btn-default" onclick="_set_deliver(false)">Collection
+            <div class="btn-group btn-group-justified" id="CashCard">
+              <a id="card" class="btn btn-default" onclick="_set_card(true)">Card
+              <a id="cash" class="btn btn-default" onclick="_set_card(false)">Cash
           <table class="table table-striped">
             <thead>
               <tr>
