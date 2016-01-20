@@ -1,3 +1,4 @@
+<!--
 <div class="main-header">
   <div class="container main-container">
     <div class="col-md-12">
@@ -5,13 +6,14 @@
     <div class="col-md-12">
       <a href="@{MenuR}">Order
       <a href="">Book
-
-<div class="container main-container">
-  <div class="col-md-12">
+-->
+<div class="container main-container begin-template">
+  <div class="col-md-4">
+    <img src="@{StaticR deployments_jadegarden_food2_gif}" alt="Noodle food" class="img-responsive">
+  <div class="col-md-8">
     <h2>About
-    <p>The JADE GARDEN Chinese Take Away is a very well estbatlished business, our head chef has#
-    over 20 years of experinces, cooking oriental food. Using the finest ingredents, and their#
-    country of orgin, we specailise in Pekinese, Cantonese, Szechuan and Chinese meals.
+    <p>The Jade Garden chinese take away is a very well established business, our head chef has over 20 years of experience, cooking oriental food. Using the finest ingredients, and their country of origin, we specialise in Pekinese, Cantonese, Szechuan and Chinese meals.
+    <p>With our new website you can now order online from any device and when you do you will receive 10% off. To take advantage of this offer, simply enter ONLINE10 into the discout code section in the checkout.
 
 <div class="container main-container">
   <div class="col-md-12">

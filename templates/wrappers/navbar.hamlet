@@ -1,7 +1,7 @@
 <header class="container-fluid">
   <div class="container main-container">
     <div class="col-md-4">
-      <h1 class="logo">Jadegarden
+      <h1 class="logo"><img src="@{StaticR deployments_jadegarden_logo_png}"
     <div class="col-md-8">
       <nav class="navbar navbar-simple" role="navigation">
         <div class="container-fluid navbar-inner">
@@ -17,10 +17,19 @@
               <li><a href="@{MenuR}">Menu</a>
               $maybe _ <- maid
                 $if manager
-                  <li><a href="@{ProductR}">Manage Products</a>
+                  <li><a href="@{ProductR}">Manage</a>
                 <li><a href="@{AuthR LogoutR}">Logout</a>
               $nothing
                 <li><a href="@{AuthR LoginR}">Login</a>
+  <!-- Basically this section here needs to be an optional piece that can be added to a page I think -->
+  <div class="container main-container banner">
+    <div class="col-md-7 text-container">
+      <div class="text">
+        <h3>Mixed Seafood Chow Mein
+        <p>A tasty noodle dish made from lobster, king prawn and octupus. Very nice, can recommend.
+    <div class="col-md-5">
+      <img src="@{StaticR deployments_jadegarden_food_png}" class="image-responsive" alt="Mixed Seafood Chow Mein">
+  <!-- End of optional piece -->
 $maybe msg <- mmsg
   <div class="container main-container" style="margin-top: 10px">
     <div class="col-md-12 alert alert-danger" role="alert">

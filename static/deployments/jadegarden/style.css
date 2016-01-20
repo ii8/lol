@@ -1,0 +1,48 @@
+body{
+  font-family: tahoma, arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6{ color: #B00000; }
+h3{ font-weight: bold; color: #B00000; font-size: 24px;}
+p{ font-size: 16px; }
+
+header, header a, header h3{
+  color: #fff;
+}
+
+header{
+  padding: 20px 0 10px 0;
+
+  -webkit-box-shadow: 0px 0px 20px 0px rgba(0,0,0,1);
+  -moz-box-shadow: 0px 0px 20px 0px rgba(0,0,0,1);
+  box-shadow: 0px 0px 20px 0px rgba(0,0,0,1);
+
+  background: rgba(178,0,0,1);
+background-image: url('bgpattern.png'). -moz-linear-gradient(top, rgba(178,0,0,1) 0%, rgba(217,0,0,1) 100%);
+background-image: url('bgpattern.png'), -webkit-gradient(left top, left bottom, color-stop(0%, rgba(178,0,0,1)), color-stop(100%, rgba(217,0,0,1)));
+background-image: url('bgpattern.png'), -webkit-linear-gradient(top, rgba(178,0,0,1) 0%, rgba(217,0,0,1) 100%);
+background-image: url('bgpattern.png'), -o-linear-gradient(top, rgba(178,0,0,1) 0%, rgba(217,0,0,1) 100%);
+background-image: url('bgpattern.png'), -ms-linear-gradient(top, rgba(178,0,0,1) 0%, rgba(217,0,0,1) 100%);
+background-image: url('bgpattern.png'), linear-gradient(to bottom, rgba(178,0,0,1) 0%, rgba(217,0,0,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b20000', endColorstr='#d90000', GradientType=0 );
+
+/*  background-image: url('bgpattern.png');
+ background-position: center;*/
+}
+
+/*
+header ul { list-style-type: none; margin-top: 15px; text-align: right; }
+header ul li { display: inline-block; }*/
+.navbar-simple .navbar-inner .nav li a { text-transform: none; font-weight: 100; font-size: 18px; width: 120px; text-align: center;}
+.navbar-simple .navbar-inner .nav li a:hover { width: 120px; }
+/*
+header ul li a:hover { background-color: #D14494; text-decoration: none; color: #fff; }
+.login-btn { font-weight: bold; }*/
+
+.banner { padding-top: 40px; padding-bottom: 40px;}
+.banner h3 { font-size: 36px; }
+.banner p { font-size: 20px; }
+.banner .text-container {  }
+.banner .text { vertical-align: bottom; height: 100%; margin-top: -20px; }
+.banner .image { vertical-align: middle; }
+.begin-template { margin-top: 40px; }
