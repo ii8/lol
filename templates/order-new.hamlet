@@ -1,0 +1,19 @@
+<div class="container main-container">
+  <div class="col-md-12">
+    <div class="col-md-12">
+      <h1>Place an Order
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID
+            <th>Name
+            <th>Price
+            <th>Quantity
+        <tbody>
+        $forall (key, product, price, quantity) <- rows
+          <tr><td>#{fromSqlKey key}</td><td>#{product}</td><td>#{price}</td><td>#{quantity}</td>
+            
+      <form id="co-form" action="@{OrderR}" method="POST">
+        ^{fw}
+        ^{co}
+        <button class="btn btn-green" id="co-submit">Buy

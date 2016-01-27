@@ -14,3 +14,11 @@ data PieceDataType = Plain | Reference | Markup
 
 derivePersistField "PieceDataType"
 
+data OrderStatus =  New | Complete | Cancelled
+    deriving (Show, Read, Eq)
+derivePersistField "OrderStatus"
+
+data PaymentStatus = Payable | Paid | Unpaid | Refunded
+    deriving (Show, Read, Eq)
+derivePersistField "PaymentStatus"
+

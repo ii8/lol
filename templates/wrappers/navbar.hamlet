@@ -14,12 +14,15 @@
           <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav navbar-right">
               <li><a href="@{HomeR}">Home</a>
-              <li><a href="@{MenuR}">Menu</a>
               $maybe _ <- maid
                 $if manager
-                  <li><a href="@{ProductR}">Manage</a>
+                  <li><a href="@{OrderR}">Orders</a>
+                  <li><a href="@{ProductR}">Manage Products</a>
+                $else
+                  <li><a href="@{MenuR}">Menu</a>
                 <li><a href="@{AuthR LogoutR}">Logout</a>
               $nothing
+                <li><a href="@{MenuR}">Menu</a>
                 <li><a href="@{AuthR LoginR}">Login</a>
   <!-- Basically this section here needs to be an optional piece that can be added to a page I think -->
   <div class="container main-container banner">

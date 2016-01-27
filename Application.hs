@@ -33,6 +33,7 @@ import Handler.Common
 import Handler.Custom
 import Handler.Menu
 import Handler.Order
+import Handler.OrderNew
 import Handler.Product
 
 -- This line actually creates our YesodDispatch instance. It is the second half

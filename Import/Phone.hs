@@ -4,6 +4,7 @@ module Import.Phone where
 import Import.Base
 import Text.Julius (rawJS)
 import Data.Char (isDigit)
+import Text.Blaze (ToMarkup(..))
 import qualified Data.Attoparsec.Text as AP
 
 newtype Phone = Phone Text
@@ -16,6 +17,9 @@ instance PersistField Phone where
 
 instance PersistFieldSql Phone where
     sqlType _ = SqlString
+
+instance ToMarkup Phone where
+    toMarkup (Phone n) = toMarkup n
 
 parsePhone' :: Text -> Either FormMessage Phone
 parsePhone' s = let n = filter (\c -> isDigit c) s in

@@ -29,6 +29,7 @@ library
                      Handler.Custom
                      Handler.Menu
                      Handler.Order
+                     Handler.OrderNew
                      Handler.Product
 
     if flag(dev) || flag(library-only)

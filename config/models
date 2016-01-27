@@ -54,7 +54,8 @@ Order
     user UserId Maybe
     card Bool
     deliver Bool
-    complete Bool
+    status OrderStatus
+    payment PaymentStatus
     address AddressId Maybe
     phone Phone
 OrderLine

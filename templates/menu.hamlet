@@ -46,4 +46,4 @@
               <tr>
                 <th>Total
                 <th id="basketTotal">0.00
-          <a href="@{OrderR}" class="btn btn-green">Order Now
+          <a href="@{OrderNewR}" class="btn btn-green">Order Now
