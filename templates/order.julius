@@ -1,0 +1,18 @@
+
+function complete(order)
+{
+    $.ajax({
+        type: "POST",
+        url: "/ajax/order/complete/" + order,
+        //data: order,
+        dataType: "json",
+        success: function(response)
+        {
+            $('#order-table').replaceWith(response);
+        },
+        error: function(response)
+        {
+            alert(response);
+        }
+    });
+}

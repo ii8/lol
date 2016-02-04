@@ -10,7 +10,9 @@
 /product                ProductR        GET      !manager
 /product/new            ProductNewR     GET POST !manager
 !/product/#ProductId    ProductEditR    GET POST !manager
-/order                  OrderR          GET
+/order                  OrderR          GET      !manager
+
+/ajax/order/complete/#OrderId  AjaxOrderCompleteR  POST !manager
 
 /                       HomeR           GET
 !/#Text                 CustomR         GET
