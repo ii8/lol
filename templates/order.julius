@@ -10,9 +10,9 @@ function complete(order)
         {
             $('#order-table').replaceWith(response);
         },
-        error: function(response)
+        error: function(jqXHR, status, msg)
         {
-            alert(response);
+            alert(status + ": " + msg);
         }
     });
 }

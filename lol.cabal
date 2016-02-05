@@ -104,6 +104,7 @@ library
         , stripe-haskell
         , markdown
         , http-types
+        , blaze-html
 
 executable lol
     if flag(library-only)

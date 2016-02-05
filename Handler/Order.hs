@@ -2,6 +2,9 @@
 module Handler.Order (getOrderR, postAjaxOrderCompleteR) where
 
 import Import
+import Text.Hamlet (hamletFile)
+import Text.Blaze.Html.Renderer.Text (renderHtml)
+import qualified Data.Aeson as Json
 
 orderList :: Handler [(Value OrderId,
                        Value Phone,
@@ -22,22 +25,23 @@ orderList = do
             , o ^. OrderDeliver
             , o ^. OrderStatus
             , o ^. OrderPayment
-            , a)
+            , a
+            )
 
-orderTable :: Handler Widget
-orderTable = orderList >>= \rows -> return $(whamletFile "templates/order-table.hamlet")
+orderTable :: Handler Html
+orderTable = do
+    rows <- orderList
+    withUrlRenderer $(hamletFile "templates/order-table.hamlet")
 
 getOrderR :: Handler Html
 getOrderR = do
     table <- orderTable
     defaultLayout $(widgetFile "order")
 
-postAjaxOrderCompleteR :: OrderId -> Handler Html
+postAjaxOrderCompleteR :: OrderId -> Handler Json.Value
 postAjaxOrderCompleteR key = do
     d <- getDeploymentId
     runDB $ update $ \o -> do
         set o [ OrderStatus =. val Complete, OrderPayment =. val Paid ]
         where_ ( o ^. OrderId ==. val key &&. o ^. OrderDeployment ==. val d )
-    w <- orderTable
-    pc <- widgetToPageContent w
-    withUrlRenderer $ pageBody pc
+    returnJson . renderHtml =<< orderTable
