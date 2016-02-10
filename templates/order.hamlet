@@ -1,2 +1,3 @@
-<h1>Place an Order
-^{table}
+<div class="container main-container">
+  <h1>Recent Orders
+  ^{table}
