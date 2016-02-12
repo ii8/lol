@@ -18,7 +18,7 @@ instance Num Money where
 
 renderMoney :: Money -> Text
 renderMoney (Money m) =
-    let s = pack $ show m
+    let s = show m
         l = length s
         cat (a, b) = a <> "." <> b in
     case l of
@@ -54,7 +54,7 @@ instance PersistField Money where
     toPersistValue (Money i) = PersistInt64 $ fromIntegral i
     fromPersistValue (PersistInt64 i) = Right $ Money $ fromIntegral i
     fromPersistValue (PersistDouble i) = Right $ Money (truncate i :: Int) -- oracle, what a shit database
-    fromPersistValue x = Left $ pack $ "int Expected Integer, received: " ++ show x
+    fromPersistValue x = Left $ "int Expected Integer, received: " <> show x
 
 instance PersistFieldSql Money where
     sqlType _ = SqlInt64

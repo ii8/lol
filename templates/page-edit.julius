@@ -1,0 +1,8 @@
+$('[data-piece-id]').on('click', function()
+{
+    $(this).css("border", "2px solid blue");
+    $(this).find('[data-piece-data]').each(function()
+    {
+        $(this).css("border", "2px solid red");
+    });
+});

@@ -11,6 +11,8 @@ import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import Network.Wai (requestHeaderHost)
 import Network.HTTP.Types.Status (badRequest400)
+import Data.Set (member)
+import qualified Data.Text as Text
 
 import qualified Network.Mail.Mime as Mail
 import Text.Shakespeare.Text (stext)
@@ -58,7 +60,7 @@ getDeployment' =
         r <- waiRequest
         maybe
             (sendResponseStatus badRequest400 ())
-            (return . takeWhile (/= ':') . decodeUtf8)
+            (return . Text.takeWhile (/= ':') . decodeUtf8)
             (requestHeaderHost r)
 
 getDeployment :: Handler Deployment
@@ -111,6 +113,7 @@ instance Yesod App where
             addStylesheet $ StaticR deployments_jadegarden_style_css
             addScript $ StaticR js_jquery_1_11_3_min_js
             addScript $ StaticR js_bootstrap_min_js
+            addScript $ StaticR js_ajax_js
             wrap widget wrapper
         withUrlRenderer [hamlet|
 <!DOCTYPE html>

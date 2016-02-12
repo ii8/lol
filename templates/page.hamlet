@@ -1,0 +1,13 @@
+<div class="container main-container">
+  <div class="col-md-12">
+    <h1>Manage Custom Pages
+    <form method=post action=@{PageNewR} enctype=#{enc}>
+      ^{widget}
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Existing Pages
+      <tbody>
+        $forall Entity key (Page _ name _) <- ps
+          <tr><td><a href="@{PageEditR key}">#{name}</a></td>

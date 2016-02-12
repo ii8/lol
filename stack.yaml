@@ -32,4 +32,5 @@ extra-include-dirs:
 # - /opt/local/include
 - /usr/local/opt/openssl/include
 extra-lib-dirs:
+- /usr/lib
 - /usr/local/opt/openssl/lib

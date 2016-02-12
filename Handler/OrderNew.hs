@@ -78,7 +78,7 @@ handlePayment = do
                 then do
                     sr <- runStripe vamount
                     case sr of
-                        Left e -> error $ show e
+                        Left e -> error . unpack $ show e
                         Right _ -> return True
                 else return False
         else error "u wot m8" -- TODO: Add "oops prices have changes since you made choice" page
@@ -141,10 +141,11 @@ saveOrder card deliver p ma = do
     ps <- query
     _ <- forM ps $ \(pid, _, c, q) ->
         runDB $ insert $ OrderLine o pid c q
+    completeOrder
     redirect OrderCompleteR
 
-getOrderCompleteR :: Handler Html
-getOrderCompleteR = do
+completeOrder :: Handler ()
+completeOrder = do
     deleteCookie "order" "/"
     deleteCookie "deliver" "/"
     deleteCookie "card" "/"
@@ -157,4 +158,8 @@ getOrderCompleteR = do
         [stext|
             There is new orderz!!
         |]
-    defaultLayout $ setTitle "Thank You" >> toWidget [whamlet|Success|]
+
+getOrderCompleteR :: Handler Html
+getOrderCompleteR = defaultLayout $ do
+    setTitle "Thank You"
+    toWidget [whamlet|Success|]

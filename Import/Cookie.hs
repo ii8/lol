@@ -9,6 +9,7 @@ import Data.Text.Lazy.Builder (toLazyText)
 import Data.Aeson.Types (Value, Parser, parseMaybe, withObject, withArray)
 import Data.Aeson.Parser (json)
 import Data.Attoparsec.ByteString (parse, IResult(Done))
+import Data.Vector (toList)
 
 newtype OrderCookie = OrderCookie [(ProductId, Int)]
 

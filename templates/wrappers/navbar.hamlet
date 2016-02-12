@@ -17,7 +17,8 @@
               $maybe _ <- maid
                 $if manager
                   <li><a href="@{OrderR}">Orders</a>
-                  <li><a href="@{ProductR}">Manage Products</a>
+                  <li><a href="@{ProductR}">Products</a>
+                  <li><a href="@{PageR}">Pages</a>
                 $else
                   <li><a href="@{MenuR}">Menu</a>
                 <li><a href="@{AuthR LogoutR}">Logout</a>

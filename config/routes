@@ -12,7 +12,13 @@
 !/product/#ProductId    ProductEditR    GET POST !manager
 /order                  OrderR          GET      !manager
 
-/ajax/order/complete/#OrderId  AjaxOrderCompleteR  POST !manager
+/page                   PageR           GET      !manager
+/page/new               PageNewR            POST !manager
+!/page/#PageId          PageEditR       GET      !manager
+
+/ajax/order/complete/#OrderId  AjaxOrderCompleteR POST        !manager
+/ajax/page/piece/#PieceId      AjaxPagePieceR     POST DELETE !manager
+/ajax/page/data/#PieceId/#Text AjaxPageDataR      POST        !manager
 
 /                       HomeR           GET
 !/#Text                 CustomR         GET

@@ -13,6 +13,7 @@ Page
     piece PieceId
     UniquePage deployment name
 Piece
+    deployment DeploymentId
     template Text
 PieceData
     piece PieceId
