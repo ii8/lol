@@ -9,7 +9,7 @@
 -->
 <div class="container main-container begin-template">
   <div class="col-md-4">
-    <img src="@{StaticR deployments_jadegarden_food2_gif}" alt="Noodle food" class="img-responsive">
+    <img src="@{local domain ["img", "food2.gif"]}" alt="Noodle food" class="img-responsive">
   <div class="col-md-8">
     <h2>About
     <p>The Jade Garden chinese take away is a very well established business, our head chef has over 20 years of experience, cooking oriental food. Using the finest ingredients, and their country of origin, we specialise in Pekinese, Cantonese, Szechuan and Chinese meals.
@@ -17,8 +17,10 @@
 
 <div class="container main-container">
   <div class="col-md-12">
-    <h2>Deployment: #{domainName}
+    <h2>Deployment: #{domain}
 
     <p>The LOL wins every time #{fromSqlKey lolDep} #{fromSqlKey nutherDep}
+    <h3>Request headers
+    <p>#{req}
 
     <div>^{mainBox}

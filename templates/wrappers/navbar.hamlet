@@ -1,7 +1,7 @@
 <header class="container-fluid">
   <div class="container main-container">
     <div class="col-md-4">
-      <h1 class="logo"><img src="@{StaticR deployments_jadegarden_logo_png}"
+      <h1 class="logo"><img src="@{local domain ["img", "logo.png"]}"
     <div class="col-md-8">
       <nav class="navbar navbar-simple" role="navigation">
         <div class="container-fluid navbar-inner">
@@ -32,7 +32,7 @@
         <h3>Mixed Seafood Chow Mein
         <p>A tasty noodle dish made from lobster, king prawn and octupus. Very nice, can recommend.
     <div class="col-md-5">
-      <img src="@{StaticR deployments_jadegarden_food_png}" class="image-responsive" alt="Mixed Seafood Chow Mein">
+      <img src="@{local domain ["img", "food.png"]}" class="image-responsive" alt="Mixed Seafood Chow Mein">
   <!-- End of optional piece -->
 $maybe msg <- mmsg
   <div class="container main-container" style="margin-top: 10px">

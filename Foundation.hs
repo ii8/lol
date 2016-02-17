@@ -84,11 +84,18 @@ getDeploymentId = do
         Just (Entity k _) -> return k
         Nothing -> notFound
 
+getDomain :: Handler Text
+getDomain = deploymentDomain <$> getDeployment
+
+local :: Text -> [Text] -> Route (HandlerSite (WidgetT App IO))
+local d p = StaticR $ StaticRoute (d : p) []
+
 wrap :: Widget -> Text -> Widget
 wrap w "navbar" = do
     maid <- handlerToWidget maybeAuthId
     mmsg <- getMessage
     manager <- handlerToWidget $ checkLevel Manager
+    domain <- handlerToWidget getDomain
     $(widgetFile "wrappers/navbar")
 wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
 
@@ -101,19 +108,19 @@ instance Yesod App where
 
     defaultLayout widget = do
         -- Need getDeploymentSafe because the subwidget might be a 404 response already.
-        wrapper <- do
+        (domain, wrapper) <- do
             md <- getDeploymentSafe
             return $ case md of
-                Just d -> deploymentWrapper d
-                Nothing -> ""
+                Just d -> (deploymentDomain d, deploymentWrapper d)
+                Nothing -> ("fallback", "")
 
         pc <- widgetToPageContent $ do
-            addStylesheet $ StaticR css_bootstrap_css
-            addStylesheet $ StaticR css_base_css
-            addStylesheet $ StaticR deployments_jadegarden_style_css
-            addScript $ StaticR js_jquery_1_11_3_min_js
-            addScript $ StaticR js_bootstrap_min_js
-            addScript $ StaticR js_ajax_js
+            addStylesheet $ StaticR global_css_bootstrap_css
+            addStylesheet $ StaticR global_css_base_css
+            addStylesheet $ local domain ["css", "style.css"]
+            addScript $ StaticR global_js_jquery_1_11_3_min_js
+            addScript $ StaticR global_js_bootstrap_min_js
+            addScript $ StaticR global_js_ajax_js
             wrap widget wrapper
         withUrlRenderer [hamlet|
 <!DOCTYPE html>

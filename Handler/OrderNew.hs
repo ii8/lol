@@ -57,6 +57,7 @@ checkout :: Money -> Widget
 checkout (Money amount) = do
     addScriptRemote "https://checkout.stripe.com/checkout.js"
     key <- handlerToWidget $ deploymentStripePublic <$> getDeployment
+    d <- handlerToWidget $ getDomain
     $(widgetFile "checkout")
 
 runStripe :: Int -> Handler (Either StripeError (StripeReturn CreateCharge))

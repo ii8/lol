@@ -27,5 +27,5 @@ getMenuR :: Handler Html
 getMenuR = do
     rows <- query
     defaultLayout $ do
-        addScript $ StaticR js_order_js
+        addScript $ StaticR global_js_order_js
         $(widgetFile "menu")

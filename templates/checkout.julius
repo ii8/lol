@@ -1,6 +1,6 @@
 var handler = StripeCheckout.configure({
     key: #{toJSON key},
-    image: "@{StaticR img_torii_gate_png}",
+    image: "@{local d ["img", "checkout.png"]}",
     locale: 'auto',
     token: function(token) {
         $("input[name='co-token']").val(token.id);

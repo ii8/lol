@@ -21,9 +21,10 @@ renderPiece' ps key template =
     "default" -> do
         $(widgetFile "pieces/default")
     "test" -> do
-        domainName <- handlerToWidget $ deploymentDomain <$> getDeployment
+        domain <- handlerToWidget $ deploymentDomain <$> getDeployment
         lolDep <- handlerToWidget getDeploymentId
         nutherDep <- handlerToWidget getDeploymentId
+        req <- return . show =<< waiRequest
         let mainBox = getData ps key "mainbox"
         $(widgetFile "pieces/test")
     "laxus" -> do
