@@ -15,9 +15,10 @@ insert into `deployment` set
     `stripe_secret` = "sk_test_cC82zVtq4YT0Y90ZuXesESTX",
     `email` = "dave@sharklasers.com";
 insert into `piece` set
+    `deployment` = 1,
     `template` = "test";
 insert into `page` set
-    `deployment` = (select `id` from `deployment` where `domain` = "localhost"),
+    `deployment` = 1,
     `name` = "home",
     `piece` = 1;
 insert into `piece_data` set

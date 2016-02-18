@@ -5,12 +5,10 @@ module Import.Base
     , parseInt'
     ) where
 
---import ClassyPrelude.Yesod   as Import
 import BasicPrelude          as Import hiding (on, groupBy, insert, insertBy, delete,
                                                deleteBy, length, splitAt, filter)
 import Data.Text             as Import (pack, unpack, length, splitAt, filter)
 import Data.Text.Lazy        as Import (toStrict, fromStrict)
---import ClassyPrelude         as Import hiding (on, isNothing, groupBy)
 import Yesod.Core            as Import hiding (Header, Value)
 import Yesod.Form            as Import hiding (parseTime)
 import Yesod.Static          as Import

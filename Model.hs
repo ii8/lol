@@ -1,7 +1,8 @@
 module Model where
 
-import ClassyPrelude.Yesod
-import Database.Persist.Quasi
+import BasicPrelude
+import Database.Persist.Quasi (lowerCaseSettings)
+import Database.Persist.TH
 
 import Import.Money
 import Import.Phone

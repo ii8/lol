@@ -5,14 +5,16 @@
 -- declared in the Foundation.hs file.
 module Settings where
 
-import ClassyPrelude.Yesod
+import BasicPrelude
+import Data.Default
 import Control.Exception          (throw)
-import Data.Aeson                 (Result (..), fromJSON, withObject, (.!=), (.:?))
+import Data.Aeson
 import Data.FileEmbed             (embedFile)
 import Data.Yaml                  (decodeEither')
 import Database.Persist.MySQL     (MySQLConf)
 import Language.Haskell.TH.Syntax (Exp, Name, Q)
 import Network.Wai.Handler.Warp   (HostPreference)
+import Yesod.Static
 import Yesod.Default.Config2      (applyEnvValue, configSettingsYml)
 import Yesod.Default.Util         (WidgetFileSettings, widgetFileNoReload,
                                    widgetFileReload)

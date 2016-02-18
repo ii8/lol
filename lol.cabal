@@ -66,10 +66,11 @@ library
         , yesod-auth
         , yesod-static
         , yesod-form
+        , yesod-persistent
         , basic-prelude
         --, classy-prelude
         --, classy-prelude-conduit
-        , classy-prelude-yesod
+        --, classy-prelude-yesod
         , bytestring
         , text
         , persistent
@@ -78,18 +79,18 @@ library
         , template-haskell
         , shakespeare
         , hjsmin
-        , monad-control
+        --, monad-control
         , wai-extra
         , yaml
         , http-conduit
-        , directory
+        --, directory
         , warp
         , data-default
         , aeson
         , conduit
         , monad-logger
         , fast-logger
-        , wai-logger
+        --, wai-logger
         , file-embed
         --, safe
         --, unordered-containers
@@ -101,7 +102,6 @@ library
         , blaze-markup
         , mime-mail
         , esqueleto
-        , yesod-persistent
         , stripe-core
         , stripe-haskell
         , markdown
