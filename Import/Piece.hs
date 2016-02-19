@@ -34,6 +34,16 @@ renderPiece' ps key template =
         let sidebar = getData ps key "sidebar"
         let content = getData ps key "content"
         $(widgetFile "pieces/sinister")
+    "rizon" -> do
+        (t, channel) <- handlerToWidget $ queryData key "channel"
+        let alpha = (==) 0 $ length $ filter (flip notElem ['a'..'z']) channel
+        if t /= Plain || not alpha
+            then toWidget [hamlet|Rizon piece: error: bad channel|]
+            else $(widgetFile "pieces/rizon")
+    "scroll" -> do
+        let text = getData ps key "text"
+        let cssClass = "scrolling-text-" <> (show $ fromSqlKey key)
+        $(widgetFile "pieces/scroll")
     _ -> toWidget [hamlet|Bad piece template|]
 
 getData :: [PieceId] -> PieceId -> Text -> Widget

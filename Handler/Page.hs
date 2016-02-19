@@ -99,24 +99,48 @@ postAjaxPageDataR pid key = do
         v <- o .: "value"
         return (readMay t, v)
     t <- maybe (invalidArgs []) return mt
-
     d <- getDeploymentId
+
+    -- If linking to another piece, check it's ours.
+    when (t == Reference) $ do
+        ref <- maybe
+            (invalidArgs [])
+            (return . toSqlKey . fromIntegral)
+            (parseUnsigned v)
+        r <- runDB $ select $ from $ \p -> do
+            where_ $ p ^. PieceId ==. val ref
+            return ( p ^. PieceDeployment )
+        case r of
+            ((Value rd):_) -> if (rd /= d)
+                then invalidArgs ["Reference piece does not exist"]
+                else return ()
+            _ -> invalidArgs ["Reference piece does not exist"]
+
     r <- runDB $ select $ from $ \p -> do
         where_ $ p ^. PieceId ==. val pid
         return ( p ^. PieceDeployment )
     case r of
-        ((Value pd):_) -> if pd /= d
-            then notFound
-            else return ()
+        ((Value pd):_) -> do
+            when (pd /= d) notFound
+            c <- getCount
+            case c of
+                ((Value 0):_) -> insertNew t v
+                _ -> updateExisting t v
         [] -> notFound
-
-    runDB $ update $ \p -> do
-        set p [ PieceDataType =. val t, PieceDataValue =. val v ]
-        where_ $ p ^. PieceDataPiece ==. val pid
-            &&. p ^. PieceDataKey ==. val key
 
     -- PieceData might actually use special css etc...
     return Json.Null
+  where
+    getCount :: Handler [Value Int]
+    getCount = runDB $ select $ from $ \p -> do
+        where_ $ p ^. PieceDataPiece ==. val pid
+            &&. p ^. PieceDataKey ==. val key
+        return countRows
+    insertNew t v = void $ runDB $ insert $ PieceData pid t key v
+    updateExisting t v = runDB $ update $ \p -> do
+        set p [ PieceDataType =. val t, PieceDataValue =. val v ]
+        where_ $ p ^. PieceDataPiece ==. val pid
+            &&. p ^. PieceDataKey ==. val key
 
 
 getJson :: FromJSON a => (a -> Json.Parser b) -> Handler b

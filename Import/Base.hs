@@ -2,6 +2,7 @@ module Import.Base
     ( module Import
     , apresult
     , parseInt
+    , parseUnsigned
     , parseInt'
     ) where
 
@@ -31,6 +32,9 @@ apresult (AP.Done _ r) = Just r
 
 parseInt :: Text -> Maybe Int
 parseInt str = apresult $ AP.parse (AP.signed AP.decimal) str
+
+parseUnsigned :: Text -> Maybe Int
+parseUnsigned str = apresult $ AP.parse AP.decimal str
 
 -- Unsafe Int read
 parseInt' :: Text -> Int
