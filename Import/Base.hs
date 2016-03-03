@@ -12,6 +12,7 @@ import Data.Text             as Import (pack, unpack, length, splitAt, filter)
 import Data.Text.Lazy        as Import (toStrict, fromStrict)
 import Yesod.Core            as Import hiding (Header, Value)
 import Yesod.Form            as Import hiding (parseTime)
+import Yesod.Form.Bootstrap3 as Import
 import Yesod.Static          as Import
 import Yesod.Persist.Core    as Import
 import Network.HTTP.Client.Conduit as Import

@@ -5,6 +5,7 @@ import Import.Base
 import Text.Julius (rawJS)
 import Data.Char (isDigit)
 import Text.Blaze (ToMarkup(..))
+import Data.Aeson (withText)
 import qualified Data.Attoparsec.Text as AP
 
 newtype Phone = Phone Text
@@ -20,6 +21,12 @@ instance PersistFieldSql Phone where
 
 instance ToMarkup Phone where
     toMarkup (Phone n) = toMarkup n
+
+instance FromJSON Phone where
+    parseJSON = withText "Phone number" $ return . Phone
+
+instance ToJSON Phone where
+    toJSON (Phone a) = String a
 
 parsePhone' :: Text -> Either FormMessage Phone
 parsePhone' s = let n = filter (\c -> isDigit c) s in

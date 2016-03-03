@@ -1,18 +1,15 @@
 
-function complete(order)
+function call(op, order)
 {
-    $.ajax({
-        type: "POST",
-        url: "/ajax/order/complete/" + order,
-        //data: order,
-        dataType: "json",
-        success: function(response)
-        {
-            $('#order-table').replaceWith(response);
-        },
-        error: function(jqXHR, status, msg)
-        {
-            alert(status + ": " + msg);
-        }
-    });
+    var success = function(response)
+    {
+       $('#order-table').replaceWith(response);
+    };
+
+    var fail = function(status, msg)
+    {
+        alert(status + ": " + msg);
+    };
+
+    ajax("/ajax/order/" + op + "/" + order, null, success, fail);
 }

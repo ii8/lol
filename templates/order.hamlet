@@ -1,3 +1,13 @@
 <div class="container main-container">
   <h1>Recent Orders
   ^{table}
+
+  <div class="col-md-4">
+    <form method="post" enctype=#{aenc}>
+      ^{afw}
+      <input type="submit" class="btn btn-green" value="New Address">
+
+  <div class="col-md-4">
+    <form method="post" enctype=#{oenc}>
+      ^{ofw}
+      <input type="submit" class="btn btn-green" value="New Order">

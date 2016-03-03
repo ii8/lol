@@ -34,6 +34,9 @@ User
 UserAddress
     user UserId
     address AddressId
+DeploymentAddress
+    deployment DeploymentId
+    address AddressId
 Address
     name Text Maybe
     lineone Text
