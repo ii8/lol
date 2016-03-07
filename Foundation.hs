@@ -16,6 +16,9 @@ import qualified Data.Text as Text
 
 import qualified Network.Mail.Mime as Mail
 import Text.Shakespeare.Text (stext)
+import Text.Julius (juliusFile)
+import qualified Data.CaseInsensitive as CI
+import qualified Data.Aeson as Json
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -106,6 +109,20 @@ instance Yesod App where
         120    -- timeout in minutes
         "config/client_session_key.aes"
 
+    yesodMiddleware = csrfCheck . defaultYesodMiddleware
+      where
+        csrfCheck handler = csrfCheckMiddleware
+            handler
+            shouldCheck
+            defaultCsrfHeaderName
+            defaultCsrfParamName
+        shouldCheck = do
+            r <- getCurrentRoute
+            case r of
+                Just (AuthR _) -> return False
+                Just r' -> isWriteRequest r'
+                Nothing -> return False
+
     defaultLayout widget = do
         -- Need getDeploymentSafe because the subwidget might be a 404 response already.
         (domain, wrapper) <- do
@@ -114,13 +131,16 @@ instance Yesod App where
                 Just d -> (deploymentDomain d, deploymentWrapper d)
                 Nothing -> ("fallback", "")
 
+        token <- returnJson . reqToken =<< getRequest
+        let csrfHeader = Json.toJSON $ decodeUtf8 $ CI.original defaultCsrfHeaderName
+
         pc <- widgetToPageContent $ do
             addStylesheet $ StaticR global_css_bootstrap_css
             addStylesheet $ StaticR global_css_base_css
             addStylesheet $ local domain ["css", "style.css"]
             addScript $ StaticR global_js_jquery_1_11_3_min_js
             addScript $ StaticR global_js_bootstrap_min_js
-            addScript $ StaticR global_js_ajax_js
+            toWidget $(juliusFile "templates/ajax.julius")
             wrap widget wrapper
         withUrlRenderer [hamlet|
 <!DOCTYPE html>

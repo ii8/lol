@@ -108,6 +108,7 @@ library
         , http-types
         , blaze-html
         , vector
+        , case-insensitive
 
 executable lol
     if flag(library-only)
