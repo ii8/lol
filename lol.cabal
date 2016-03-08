@@ -23,6 +23,7 @@ library
         Import.Cookie
         Import.Money
         Import.Phone
+        Import.Charge
         Model
         Settings
         Settings.StaticFiles

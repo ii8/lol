@@ -8,6 +8,7 @@ module Import.Base
 
 import BasicPrelude          as Import hiding (on, groupBy, insert, insertBy, delete,
                                                deleteBy, length, splitAt, filter)
+import Data.Either           as Import
 import Data.Text             as Import (pack, unpack, length, splitAt, filter)
 import Data.Text.Lazy        as Import (toStrict, fromStrict)
 import Yesod.Core            as Import hiding (Header, Value)

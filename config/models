@@ -62,6 +62,7 @@ Order
     payment PaymentStatus
     address AddressId Maybe
     phone Phone
+    charge ChargeId Maybe
 OrderLine
     order OrderId
     product ProductId

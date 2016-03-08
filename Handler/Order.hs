@@ -12,6 +12,9 @@ import Text.Hamlet (hamletFile)
 import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Database.Esqueleto.Internal.Language (Update)
 import qualified Data.Aeson as Json
+import Web.Stripe
+import Web.Stripe.Refund
+import Network.HTTP.Types.Status (badRequest400)
 
 orderList :: Handler [
     ( Value OrderId
@@ -63,6 +66,7 @@ formOrder o = renderDivs $ Order
     <*> areq (radioField optionsEnum) "Payment Status" (Just $ maybe Payable orderPayment o)
     <*> aopt (selectField addressList) "Address" (orderAddress <$> o)
     <*> areq phoneField "Phone number" (orderPhone <$> o)
+    <*> pure Nothing
   where
     cardList = optionsPairs [("Cash" :: Text, False), ("Card", True)]
     deliverList = optionsPairs [("Collect" :: Text, False), ("Deliver", True)]
@@ -124,6 +128,19 @@ postAjaxOrderCancelR = updateOrder
     , OrderPayment =. val Unpaid ]
 
 postAjaxOrderRefundR :: OrderId -> Handler Json.Value
-postAjaxOrderRefundR = updateOrder
-    [ OrderStatus =. val Cancelled
-    , OrderPayment =. val Refunded ]
+postAjaxOrderRefundR key = do
+    d <- getDeploymentId
+    r <- runDB $ select $ from $ \o -> do
+        where_ $ o ^. OrderId ==. val key &&. o ^. OrderDeployment ==. val d
+        return ( o ^. OrderPayment, o ^. OrderCharge )
+    case r of
+        ((Value Paid, Value (Just c)):[]) -> do
+            secret <- deploymentStripeSecret <$> getDeployment
+            let config = StripeConfig . StripeKey . encodeUtf8 $ secret
+            refund <- liftIO $ stripe config $ createRefund c
+            when (isLeft refund) (sendResponseStatus badRequest400 ())
+            updateOrder
+                [ OrderStatus =. val Cancelled
+                , OrderPayment =. val Refunded ]
+                key
+        _ -> (sendResponseStatus badRequest400 ())

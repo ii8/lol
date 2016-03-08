@@ -67,7 +67,7 @@ runStripe amount = do
     let config = StripeConfig . StripeKey . encodeUtf8 $ secret
     liftIO $ stripe config $ createCharge (Amount amount) GBP -&- token
 
-handlePayment :: Handler Bool
+handlePayment :: Handler (Maybe ChargeId)
 handlePayment = do
     famount <- runInputPost $ ireq intField "co-amount"
     rows <- query
@@ -80,8 +80,8 @@ handlePayment = do
                     sr <- runStripe vamount
                     case sr of
                         Left e -> error . unpack $ show e
-                        Right _ -> return True
-                else return False
+                        Right charge -> return . Just $ chargeId charge
+                else return Nothing
         else error "u wot m8" -- TODO: Add "oops prices have changes since you made choice" page
 
 getOrderNewR :: Handler Html
@@ -120,8 +120,8 @@ postOrderCollect = do
     ((fr, fw), _) <- runFormPost $ phoneForm Nothing
     case fr of
         FormSuccess phone -> do
-            card <- handlePayment
-            saveOrder card False phone Nothing
+            mcharge <- handlePayment
+            saveOrder (isJust mcharge) False phone Nothing mcharge
         _ -> handleOrder $ Just fw
 
 postOrderDeliver :: Handler Html
@@ -129,16 +129,17 @@ postOrderDeliver = do
     ((fr, fw), _) <- runFormPost $ bothForm Nothing
     case fr of
         FormSuccess (addr, phone) -> do
-            card <- handlePayment
-            runDB (insert addr) >>= saveOrder card True phone . Just
+            mcharge <- handlePayment
+            aid <- runDB $ insert addr
+            saveOrder (isJust mcharge) True phone (Just aid) mcharge
         _ -> handleOrder $ Just fw
 
-saveOrder :: Bool -> Bool -> Phone -> Maybe AddressId -> Handler Html
-saveOrder card deliver p ma = do
+saveOrder :: Bool -> Bool -> Phone -> Maybe AddressId -> Maybe ChargeId -> Handler Html
+saveOrder card deliver p ma charge = do
     d <- getDeploymentId
     u <- maybeAuthId
     let payment = if card then Paid else Payable
-    o <- runDB $ insert $ Order d u card deliver New payment ma p
+    o <- runDB $ insert $ Order d u card deliver New payment ma p charge
     ps <- query
     _ <- forM ps $ \(pid, _, c, q) ->
         runDB $ insert $ OrderLine o pid c q
