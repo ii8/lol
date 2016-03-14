@@ -4,6 +4,8 @@ module Import.Base
     , parseInt
     , parseUnsigned
     , parseInt'
+    , getJson
+    , unValue3
     ) where
 
 import BasicPrelude          as Import hiding (on, groupBy, insert, insertBy, delete,
@@ -26,6 +28,7 @@ import Database.Esqueleto    as Import hiding (isNothing)
 import Data.Default          as Import
 
 import qualified Data.Attoparsec.Text as AP
+import qualified Data.Aeson.Types as Json
 
 apresult :: AP.Result r -> Maybe r
 apresult (AP.Fail _ _ _) = Nothing
@@ -43,3 +46,12 @@ parseInt' :: Text -> Int
 parseInt' str = case parseInt str of
     Just a -> a
     Nothing -> error $ "unsafe use of parseInt on: " ++ (unpack str)
+
+getJson :: FromJSON a => (a -> Json.Parser b) -> HandlerT site IO b
+getJson p = do
+    body <- requireJsonBody
+    let m = Json.parseMaybe p body
+    maybe (invalidArgs []) return m
+
+unValue3 :: (Value a, Value b, Value c) -> (a, b, c)
+unValue3 (Value a, Value b, Value c) = (a, b, c)

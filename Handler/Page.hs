@@ -3,7 +3,6 @@ module Handler.Page where
 
 import Import
 import qualified Data.Aeson as Json
-import qualified Data.Aeson.Types as Json
 import Network.HTTP.Types.Status (conflict409)
 
 queryPages :: Handler [(Entity Page)]
@@ -142,9 +141,3 @@ postAjaxPageDataR pid key = do
         where_ $ p ^. PieceDataPiece ==. val pid
             &&. p ^. PieceDataKey ==. val key
 
-
-getJson :: FromJSON a => (a -> Json.Parser b) -> Handler b
-getJson p = do
-    body <- requireJsonBody
-    let m = flip Json.parseMaybe body p
-    maybe (invalidArgs []) return m

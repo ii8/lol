@@ -10,5 +10,10 @@
           <th>Price
           <th>Category
       <tbody>
-        $forall (Value key, Value product, Value price, Value category) <- ps
-          <tr><td><a href="@{ProductEditR key}">#{product}</a></td><td>#{price}</td><td>#{category}</td>
+        $forall (Value key, Value product, Value price, Value category, Value available) <- ps
+          <tr>
+            <td><a href="@{ProductEditR key}">#{product}</a>
+            <td>#{price}
+            <td>#{category}
+            <td>
+              <input type="checkbox" value="#{fromSqlKey key}" :available:checked>

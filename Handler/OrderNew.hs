@@ -9,6 +9,9 @@ import Web.Stripe.Error
 import qualified Network.Mail.Mime as Mail
 import Text.Shakespeare.Text (stext)
 
+minAmount :: Int
+minAmount = 20
+
 lookupQuantity :: ProductId -> OrderCookie -> Int
 lookupQuantity p (OrderCookie c) = case find ((==) p . fst) c >>= return . snd of
     Just a -> a
@@ -23,7 +26,8 @@ query = do
             xs <- runDB $ select $ from $ \(c `InnerJoin` p) -> do
                 on (c ^. CategoryId ==. p ^. ProductCategory)
                 where_ (p ^. ProductId `in_` valList (fmap fst cookie')
-                        &&. val d ==. c ^. CategoryDeployment)
+                        &&. val d ==. c ^. CategoryDeployment
+                        &&. p ^. ProductAvailable)
                 return
                     ( p ^. ProductId
                     , p ^. ProductName
@@ -33,8 +37,8 @@ query = do
             return $ fmap addq xs
         Nothing -> return []
 
-calculateAmount :: [(ProductId, Text, Money, Int)] -> Money
-calculateAmount = foldr (\(_, _, p, q) t -> p * (Money q) + t) 0
+calculateAmount :: [(ProductId, Text, Money, Int)] -> (Int, Money)
+calculateAmount = foldr (\(_, _, p, q) t -> (fst t + 1, p * (Money q) + snd t)) (0, 0)
 
 address :: Maybe Address -> AForm Handler Address
 address a = Address
@@ -53,8 +57,8 @@ bothForm m = renderDivs $ (,)
 phoneForm :: Maybe Phone -> Form Phone
 phoneForm p = renderDivs $ areq phoneField "Phone Number" p
 
-checkout :: Money -> Widget
-checkout (Money amount) = do
+checkout :: Int -> Money -> Widget
+checkout num (Money amount) = do
     addScriptRemote "https://checkout.stripe.com/checkout.js"
     key <- handlerToWidget $ deploymentStripePublic <$> getDeployment
     d <- handlerToWidget $ getDomain
@@ -70,19 +74,25 @@ runStripe amount = do
 handlePayment :: Handler (Maybe ChargeId)
 handlePayment = do
     famount <- runInputPost $ ireq intField "co-amount"
+    fnum <- runInputPost $ ireq intField "co-count"
     rows <- query
-    let (Money vamount) = calculateAmount rows
-    if vamount == famount && vamount >= 20
+    let (num, Money vamount) = calculateAmount rows
+    -- Note that these products will remain in the cookie, they will just be ignored.
+    when (num /= fnum) (setMessage msgAvailable >> redirect MenuR)
+    when (vamount /= famount) (setMessage msgPrice >> redirect OrderNewR)
+    when (vamount < minAmount) (setMessage msgCheap >> redirect MenuR)
+    c <- lookupCookie "card"
+    if maybe False (== "true") c
         then do
-            c <- lookupCookie "card"
-            if maybe False (== "true") c
-                then do
-                    sr <- runStripe vamount
-                    case sr of
-                        Left e -> error . unpack $ show e
-                        Right charge -> return . Just $ chargeId charge
-                else return Nothing
-        else error "u wot m8" -- TODO: Add "oops prices have changes since you made choice" page
+            sr <- runStripe vamount
+            case sr of
+                Left e -> error . unpack $ show e
+                Right charge -> return . Just $ chargeId charge
+        else return Nothing
+  where
+    msgAvailable = "Sorry, some products you selected are no longer available. Please try again."
+    msgPrice = "Sorry, prices have changed since you made your choice. Please review your selection"
+    msgCheap = "Your order must be at least 20p"
 
 getOrderNewR :: Handler Html
 getOrderNewR = handleOrder Nothing
@@ -98,13 +108,14 @@ handleOrder m = do
                 True -> return . fst =<< generateFormPost (bothForm Nothing)
                 False -> return . fst =<< generateFormPost (phoneForm Nothing)
     c <- lookupCookie "card"
-    let amount@(Money a) = calculateAmount rows
+    let (num, amount@(Money a)) = calculateAmount rows
         co = if maybe False (== "true") c
-            then checkout amount
+            then checkout num amount
             else toWidget [hamlet|
 <input type="hidden" name="co-amount" value="#{a}">
+<input type="hidden" name="co-count" value="#{num}">
 |]
-    if a >= 20
+    if a >= minAmount
         then defaultLayout $ do
             setTitle "Order"
             $(widgetFile "order-new")

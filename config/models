@@ -49,6 +49,7 @@ Product
     name Text
     description Text
     price Money
+    available Bool
 Category
     deployment DeploymentId
     name Text

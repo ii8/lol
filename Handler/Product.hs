@@ -2,6 +2,7 @@
 module Handler.Product where
 
 import Import
+import qualified Data.Aeson as Json
 
 queryProduct :: ProductId -> Handler (Maybe Product)
 queryProduct key = do
@@ -14,7 +15,7 @@ queryProduct key = do
         ((Entity _ p):_) -> Just p
         [] -> Nothing
 
-queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text)]
+queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool)]
 queryProudctList = do
     d <- getDeploymentId
     runDB $ select $ from $ \(c `InnerJoin` p) -> do
@@ -25,6 +26,7 @@ queryProudctList = do
             , p ^. ProductName
             , p ^. ProductPrice
             , c ^. CategoryName
+            , p ^. ProductAvailable
             )
 
 queryCategoryList :: Handler (OptionList CategoryId)
@@ -41,6 +43,7 @@ form p = renderDivs $ Product
     <*> areq textField "Name" (productName <$> p)
     <*> areq textField "Description" (productDescription <$> p)
     <*> areq moneyField "Price" (productPrice <$> p)
+    <*> pure (maybe False productAvailable p)
 
 cform :: Form Category
 cform = renderDivs $ Category
@@ -82,3 +85,22 @@ getProductEditR key = do
 
 postProductEditR :: Key Product -> Handler Html
 postProductEditR key = getProductEditR key
+
+postAjaxProductAvailableR :: ProductId -> Handler Json.Value
+postAjaxProductAvailableR pid = do
+    b <- getJson return
+    d <- getDeploymentId
+    r <- runDB $ select $ from $ \(p `InnerJoin` c) -> do
+        on $ c ^. CategoryId ==. p ^. ProductCategory
+        where_ $ p ^. ProductId ==. val pid
+        return $ c ^. CategoryDeployment
+
+    case r of
+        ((Value d'):[]) -> if d == d' then return () else notFound
+        _ -> notFound
+
+    runDB $ update $ \p -> do
+        set p [ ProductAvailable =. val b ]
+        where_ $ p ^. ProductId ==. val pid
+
+    return Json.Null

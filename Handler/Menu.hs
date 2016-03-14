@@ -7,7 +7,7 @@ query = do
     d <- getDeploymentId
     rows <- runDB $ select $ from $ \(c `InnerJoin` p) -> do
         on (c ^. CategoryId ==. p ^. ProductCategory)
-        where_ (c ^. CategoryDeployment ==. (val d))
+        where_ (c ^. CategoryDeployment ==. (val d) &&. p ^. ProductAvailable)
         return
             ( c ^. CategoryName
             , p ^. ProductId

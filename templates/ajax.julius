@@ -14,7 +14,8 @@ function ajax(url, data, success, error)
             } catch (e) {
                 error(200, "Invaild json");
             }
-            success(r);
+            if(success !== null)
+                success(r);
         } else {
             error(xhr.status, xhr.responseText);
         }

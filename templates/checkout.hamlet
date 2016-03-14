@@ -1,3 +1,4 @@
 <input type="hidden" name="co-amount" value="#{amount}">
+<input type="hidden" name="co-count" value="#{num}">
 <input type="hidden" name="co-token" value="">
 

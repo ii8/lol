@@ -1,0 +1,12 @@
+$("input:checkbox").on('change', function()
+{
+    var pid = $(this).val();
+    var b = $(this).prop('checked');
+
+    var fail = function(status, msg)
+    {
+        alert(status + ": " + msg);
+    };
+
+    ajax("/ajax/product/available/" + pid, b, null, fail);
+});

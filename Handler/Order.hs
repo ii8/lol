@@ -132,15 +132,17 @@ postAjaxOrderRefundR key = do
     d <- getDeploymentId
     r <- runDB $ select $ from $ \o -> do
         where_ $ o ^. OrderId ==. val key &&. o ^. OrderDeployment ==. val d
-        return ( o ^. OrderPayment, o ^. OrderCharge )
-    case r of
-        ((Value Paid, Value (Just c)):[]) -> do
+        return ( o ^. OrderPayment, o ^. OrderCard, o ^. OrderCharge )
+    case fmap unValue3 r of
+        ((Paid, True, (Just c)):[]) -> do
             secret <- deploymentStripeSecret <$> getDeployment
             let config = StripeConfig . StripeKey . encodeUtf8 $ secret
             refund <- liftIO $ stripe config $ createRefund c
             when (isLeft refund) (sendResponseStatus badRequest400 ())
-            updateOrder
-                [ OrderStatus =. val Cancelled
-                , OrderPayment =. val Refunded ]
-                key
+            doUpdate
+        ((Paid, False, Nothing):[]) -> doUpdate
         _ -> (sendResponseStatus badRequest400 ())
+  where
+    doUpdate = updateOrder
+        [ OrderStatus =. val Cancelled
+        , OrderPayment =. val Refunded ] key
