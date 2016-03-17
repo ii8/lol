@@ -3,6 +3,8 @@ module Handler.Page where
 
 import Import
 import qualified Data.Aeson as Json
+import Data.Text as Text (cons, foldr)
+import Data.Char (isDigit, isLetter, toLower)
 import Network.HTTP.Types.Status (conflict409)
 
 queryPages :: Handler [(Entity Page)]
@@ -14,14 +16,36 @@ queryPages = do
 
 form :: Form Text
 form extra = do
-    (result, view) <- mreq textField "" Nothing
+    (result, view) <- mreq pageName "" Nothing
     let widget = toWidget [whamlet|
 <div>
   #{extra}
   ^{fvInput view}
   <input type="submit" class="btn btn-green" value="New Page">
+  $maybe err <- fvErrors view
+    #{err}
 |]
     return (result, widget)
+  where
+    pageName = check'em validate textField
+    validate s = do
+        let s' = slug s
+        d <- getDeploymentId
+        m <- runDB $ checkUnique $ Page d s' (toSqlKey 0)
+        return $ case m of
+            Just _ -> Left ("Already exists" :: Text)
+            Nothing -> Right s'
+    check'em = checkM
+    slug str = snd $ Text.foldr (\c (b, s) -> new b s c) (False, "") str
+    new b s c =
+        let r = rep c
+            b' = r == '_'
+        in (b', if b && b' then s else r `cons` s)
+    rep c
+        | isDigit c = c
+        | isLetter c = toLower c
+        | otherwise = '_'
+
 
 getPageR :: Handler Html
 getPageR = do
