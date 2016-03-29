@@ -1,5 +1,5 @@
 
-module Import.Piece (renderPiece) where
+module Import.Piece (renderPiece, renderData) where
 
 import Import.Base
 import Import.Enum
@@ -49,7 +49,7 @@ renderPiece' ps key template =
 getData :: [PieceId] -> PieceId -> Text -> Widget
 getData parents pid key = do
     pdata <- handlerToWidget $ queryData pid key
-    let widget = renderData parents pdata
+    let widget = renderData' parents pdata
     [whamlet|<div data-piece-data="#{key}">^{widget}|]
 
 queryData :: PieceId -> Text -> Handler (PieceDataType, Text)
@@ -59,13 +59,13 @@ queryData piece key = do
         Just (Entity _ (PieceData _ t _ v)) -> return (t, v)
         Nothing -> return (Plain, "Missing piece data")
 
-renderData :: [PieceId] -> (PieceDataType, Text) -> Widget
-renderData _ (Plain, v) = toWidget [hamlet|#{v}|]
-renderData parents (Reference, v) = maybe
+renderData' :: [PieceId] -> (PieceDataType, Text) -> Widget
+renderData' _ (Plain, v) = toWidget [hamlet|#{v}|]
+renderData' parents (Reference, v) = maybe
     (toWidget [hamlet|Bad piece data value|])
     (renderPiece'' parents . toSqlKey . fromIntegral)
     (parseInt v)
-renderData _ (Markup, v) = toWidget [hamlet|#{markdown def (fromStrict v)}|]
+renderData' _ (Markup, v) = toWidget [hamlet|#{markdown def (fromStrict v)}|]
 
 renderPiece'' :: [PieceId] -> PieceId -> Widget
 renderPiece'' parents key = if key `elem` parents
@@ -78,3 +78,6 @@ renderPiece'' parents key = if key `elem` parents
 
 renderPiece :: PieceId -> Widget
 renderPiece = renderPiece'' []
+
+renderData :: PieceDataType -> Text -> Widget
+renderData t d = renderData' [] (t, d)

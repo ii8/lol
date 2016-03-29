@@ -7,6 +7,12 @@ Deployment
     email Text
     UniqueDeployment name
     UniqueDomain domain
+WrapData
+    deployment DeploymentId
+    type PieceDataType
+    key Text
+    value Text
+    UniqueWrapData deployment key
 Page
     deployment DeploymentId
     name Text

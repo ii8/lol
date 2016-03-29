@@ -2,6 +2,7 @@ module Foundation where
 
 import Import.Base
 import Import.Enum
+import {-# SOURCE #-} Import.Layout
 import Model
 import Text.Jasmine (minifym)
 import Yesod.Auth.Email
@@ -16,9 +17,6 @@ import qualified Data.Text as Text
 
 import qualified Network.Mail.Mime as Mail
 import Text.Shakespeare.Text (stext)
-import Text.Julius (juliusFile)
-import qualified Data.CaseInsensitive as CI
-import qualified Data.Aeson as Json
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -93,15 +91,6 @@ getDomain = deploymentDomain <$> getDeployment
 local :: Text -> [Text] -> Route (HandlerSite (WidgetT App IO))
 local d p = StaticR $ StaticRoute (d : p) []
 
-wrap :: Widget -> Text -> Widget
-wrap w "navbar" = do
-    maid <- handlerToWidget maybeAuthId
-    mmsg <- getMessage
-    manager <- handlerToWidget $ checkLevel Manager
-    domain <- handlerToWidget getDomain
-    $(widgetFile "wrappers/navbar")
-wrap w _ = getMessage >>= (\mmsg -> $(widgetFile "wrappers/default-layout"))
-
 instance Yesod App where
     approot = guessApproot
 
@@ -123,36 +112,7 @@ instance Yesod App where
                 Just r' -> isWriteRequest r'
                 Nothing -> return False
 
-    defaultLayout widget = do
-        -- Need getDeploymentSafe because the subwidget might be a 404 response already.
-        (domain, wrapper) <- do
-            md <- getDeploymentSafe
-            return $ case md of
-                Just d -> (deploymentDomain d, deploymentWrapper d)
-                Nothing -> ("fallback", "")
-
-        token <- returnJson . reqToken =<< getRequest
-        let csrfHeader = Json.toJSON $ decodeUtf8 $ CI.original defaultCsrfHeaderName
-
-        pc <- widgetToPageContent $ do
-            addStylesheet $ StaticR global_css_bootstrap_css
-            addStylesheet $ StaticR global_css_base_css
-            addStylesheet $ local domain ["css", "style.css"]
-            addScript $ StaticR global_js_jquery_1_11_3_min_js
-            addScript $ StaticR global_js_bootstrap_min_js
-            toWidget $(juliusFile "templates/ajax.julius")
-            wrap widget wrapper
-        withUrlRenderer [hamlet|
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>#{pageTitle pc}
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    ^{pageHead pc}
-  <body>
-    ^{pageBody pc}
-|]
+    defaultLayout = layout
 
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR

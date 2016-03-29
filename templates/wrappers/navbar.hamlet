@@ -26,19 +26,16 @@
               $nothing
                 <li><a href="@{MenuR}">Menu</a>
                 <li><a href="@{AuthR LoginR}">Login</a>
-  <!-- Basically this section here needs to be an optional piece that can be added to a page I think -->
-  <div class="container main-container banner">
-    <div class="col-md-7 text-container">
-      <div class="text">
-        <h3>Mixed Seafood Chow Mein
-        <p>A tasty noodle dish made from lobster, king prawn and octupus. Very nice, can recommend.
-    <div class="col-md-5">
-      <img src="@{local domain ["img", "food.png"]}" class="image-responsive" alt="Mixed Seafood Chow Mein">
-  <!-- End of optional piece -->
-$maybe msg <- mmsg
+
+  $if isHome
+    $maybe home <- mhome
+      <div class="container main-container banner">
+        ^{home}
+
+$forall (status, msg) <- ms
   <div class="container main-container" style="margin-top: 10px">
-    <div class="col-md-12 alert alert-danger" role="alert">
+    <div class="col-md-12 alert #{puts status}" role="alert">
       <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">
-      <span class="sr-only">Error:
-      #{msg}
+      <span class="sr-only">#{status}
+      #{putm msg}
 ^{w}

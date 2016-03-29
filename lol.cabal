@@ -24,6 +24,8 @@ library
         Import.Money
         Import.Phone
         Import.Charge
+        Import.Message
+        Import.Layout
         Model
         Settings
         Settings.StaticFiles
@@ -110,6 +112,8 @@ library
         , blaze-html
         , vector
         , case-insensitive
+        -- to be removed
+        , word8
 
 executable lol
     if flag(library-only)

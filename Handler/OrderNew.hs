@@ -78,9 +78,9 @@ handlePayment = do
     rows <- query
     let (num, Money vamount) = calculateAmount rows
     -- Note that these products will remain in the cookie, they will just be ignored.
-    when (num /= fnum) (setMessage msgAvailable >> redirect MenuR)
-    when (vamount /= famount) (setMessage msgPrice >> redirect OrderNewR)
-    when (vamount < minAmount) (setMessage msgCheap >> redirect MenuR)
+    when (num /= fnum) (addMessage "error" msgAvailable >> redirect MenuR)
+    when (vamount /= famount) (addMessage "error" msgPrice >> redirect OrderNewR)
+    when (vamount < minAmount) (addMessage "error" msgCheap >> redirect MenuR)
     c <- lookupCookie "card"
     if maybe False (== "true") c
         then do
@@ -89,10 +89,6 @@ handlePayment = do
                 Left e -> error . unpack $ show e
                 Right charge -> return . Just $ chargeId charge
         else return Nothing
-  where
-    msgAvailable = "Sorry, some products you selected are no longer available. Please try again."
-    msgPrice = "Sorry, prices have changed since you made your choice. Please review your selection"
-    msgCheap = "Your order must be at least 20p"
 
 getOrderNewR :: Handler Html
 getOrderNewR = handleOrder Nothing
@@ -119,7 +115,7 @@ handleOrder m = do
         then defaultLayout $ do
             setTitle "Order"
             $(widgetFile "order-new")
-        else redirect MenuR
+        else addMessage "error" msgCheap >> redirect MenuR
 
 postOrderNewR :: Handler Html
 postOrderNewR = do

@@ -62,7 +62,7 @@ getProductNewR = do
     case result of
         FormSuccess p -> do
             _ <- runDB $ insert p
-            setMessage "Created new product"
+            addMessage "success" "Created new product"
             redirect ProductR
         _ -> defaultLayout $(widgetFile "product-new")
 
@@ -79,7 +79,7 @@ getProductEditR key = do
             case result of
                 FormSuccess new -> do
                     runDB $ replace key new
-                    setMessage "Product Updated"
+                    addMessage "success" "Product Updated"
                     redirect ProductR
                 _ -> defaultLayout $(widgetFile "product-edit")
 
