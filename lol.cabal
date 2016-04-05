@@ -112,8 +112,6 @@ library
         , blaze-html
         , vector
         , case-insensitive
-        -- to be removed
-        , word8
 
 executable lol
     if flag(library-only)
