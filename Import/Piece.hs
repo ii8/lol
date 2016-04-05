@@ -6,6 +6,8 @@ import Import.Enum
 import Model
 import Foundation
 import Text.Markdown
+import Data.Text (splitOn)
+import Text.Julius (rawJS)
 
 -- To add a piece template, add hamlet file to templates/pieces
 -- and add a new pattern to this function. The third parameter is the
@@ -44,6 +46,16 @@ renderPiece' ps key template =
         let text = getData ps key "text"
         let cssClass = "scrolling-text-" <> (show $ fromSqlKey key)
         $(widgetFile "pieces/scroll")
+    "imgmenu" -> do
+        domain <- handlerToWidget $ getDomain
+        (_, raw) <- handlerToWidget $ queryData key "links"
+        let list = splitOn ";" raw
+            item (a:b:c:[]) = ( a, b, local domain (splitOn "/" c) )
+            item _ = error "Invalid list"
+            links = fmap (item . splitOn ",") list
+            pid = rawJS . show $ fromSqlKey key
+        addScript $ StaticR global_js_imgmenu_js
+        $(widgetFile "pieces/imgmenu")
     _ -> toWidget [hamlet|Bad piece template|]
 
 getData :: [PieceId] -> PieceId -> Text -> Widget
@@ -66,6 +78,7 @@ renderData' parents (Reference, v) = maybe
     (renderPiece'' parents . toSqlKey . fromIntegral)
     (parseInt v)
 renderData' _ (Markup, v) = toWidget [hamlet|#{markdown def (fromStrict v)}|]
+renderData' _ (LinkList, _) = toWidget [hamlet|Invalid link list|]
 
 renderPiece'' :: [PieceId] -> PieceId -> Widget
 renderPiece'' parents key = if key `elem` parents

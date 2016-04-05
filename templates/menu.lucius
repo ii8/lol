@@ -1,0 +1,45 @@
+
+.menu p{ margin: 0 }
+
+.basket-container{ background: #eee; text-align: center;}
+.basket-container a.btn-green { width: 100%; }
+.padding{ padding: 10px; }
+#visual-basket { text-align: left; }
+
+@media (min-width: 979px) {
+  .basket-container.affix-top {
+    position: static;
+  	width:228px;
+  }
+
+  .basket-container.affix {
+    position: fixed;
+    width:228px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .basket-container.addix-top {
+    width: 263px;
+  }
+  .basket-container.affix{
+    width: 263px;
+  }
+}
+
+.affix,.affix-top {
+   position:static;
+}
+
+.quantity-input{
+  width: 27px;
+  border-radius: 0;
+  float: left;
+  border: 0;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  height: 30px;
+  padding: 0 5px 0 5px;
+}
+
+.product { padding: 5px 10px; }

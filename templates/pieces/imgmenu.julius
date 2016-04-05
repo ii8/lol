@@ -1,0 +1,39 @@
+/*
+var final = (function()
+{
+  var timers = {};
+  return function(callback, ms, uniqueId)
+  {
+    if(!uniqueId)
+    {
+      uniqueId = "false";
+    }
+    if(timers[uniqueId])
+    {
+      clearTimeout (timers[uniqueId]);
+    }
+    timers[uniqueId] = setTimeout(callback, ms);
+  };
+})();
+*/
+
+function resize_callback()
+{
+  var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+  var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+  if(h > 1050)
+    h = 1050;
+
+  $('[data-piece-id="#{pid}"]').find('ul').AccordionImageMenu({
+    'openDim': w * 0.8 * 0.7,
+    'closeDim': w * 0.8 * 0.25,
+    'height': h - 200,
+    'fadeInTitle': false,
+  });
+
+}
+
+//$(window).on('resize', function(){final(resize_callback, 400, "win_resize_id")});
+$(window).on('resize', resize_callback);
+$(document).ready(resize_callback);
+

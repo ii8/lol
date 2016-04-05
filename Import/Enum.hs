@@ -10,7 +10,7 @@ data UserType = Customer | Manager | Admin
 
 derivePersistField "UserType"
 
-data PieceDataType = Plain | Reference | Markup
+data PieceDataType = Plain | Reference | Markup | LinkList
     deriving (Show, Read, Eq)
 
 derivePersistField "PieceDataType"

@@ -1,0 +1,6 @@
+<ul>
+  $forall (link, name, img) <- links
+    <li>
+      <a href="#{link}">
+        <span>#{name}</span>
+        <img src=@{img}>
