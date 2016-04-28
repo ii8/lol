@@ -25,8 +25,8 @@
                     <input type="text" readonly="readonly" class="quantity-input" value="0" id="quantity-display-#{key}" />
                     <a class="btn btn-default btn-sm" onclick="menu_mod(#{key}, -1)"><div class="glyphicon glyphicon-minus"></div></a>
 
-    <div class="col-md-3">
-      <div class="affix basket-container">
+    <div class="fixed-outer col-md-3">
+      <div class="fixed-element basket-container">
         <div class="padding">
           <h3>Your Order
           <div class="btn-group-special">

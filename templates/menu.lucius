@@ -12,7 +12,7 @@
   	width:228px;
   }
 
-  .basket-container.affix {
+  .basket-container.fixed-element {
     position: fixed;
     width:228px;
   }
@@ -22,7 +22,7 @@
   .basket-container.addix-top {
     width: 263px;
   }
-  .basket-container.affix{
+  .basket-container.fixed-element{
     width: 263px;
   }
 }
@@ -43,3 +43,6 @@
 }
 
 .product { padding: 5px 10px; }
+
+.fixed-outer { position: relative; }
+.fixed-element { width: parent; }

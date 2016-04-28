@@ -80,4 +80,16 @@ $(document).ready(function()
         $('#card').addClass('active');
     else
         $('#cash').addClass('active');
+
+    $(window).scroll(function(e){
+        var $el = $('.fixed-element');
+        var isPositionFixed = ($el.css('position') == 'fixed');
+
+        if ($(this).scrollTop() > 200 && !isPositionFixed){
+            $('.fixed-element').css({'position': 'fixed', 'top': '10px'});
+        }
+        if ($(this).scrollTop() < 200 && isPositionFixed){
+            $('.fixed-element').css({'position': 'static', 'top': '10px'});
+        }
+    });
 });
