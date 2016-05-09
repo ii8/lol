@@ -14,6 +14,8 @@ import Network.Wai (requestHeaderHost)
 import Network.HTTP.Types.Status (badRequest400)
 import Data.Set (member)
 import qualified Data.Text as Text
+import qualified Data.Aeson as Json
+import Text.Blaze.Html.Renderer.Text (renderHtml)
 
 import qualified Network.Mail.Mime as Mail
 import Text.Shakespeare.Text (stext)
@@ -46,6 +48,7 @@ instance HasHttpManager App where
 -- type Widget = WidgetT App IO ()
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
+type Template = (Route (HandlerSite (HandlerT App IO)) -> [(Text, Text)] -> Text) -> Html
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
 newtype CachedDeployment d
@@ -149,6 +152,9 @@ instance Yesod App where
             || level == LevelError
 
     makeLogger = return . appLogger
+
+jsonLayout :: Template -> Handler Json.Value
+jsonLayout t = returnJson . renderHtml =<< withUrlRenderer t
 
 -- How to run database actions.
 instance YesodPersist App where

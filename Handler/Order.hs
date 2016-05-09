@@ -9,7 +9,6 @@ module Handler.Order
 
 import Import
 import Text.Hamlet (hamletFile)
-import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Database.Esqueleto.Internal.Language (Update)
 import qualified Data.Aeson as Json
 import Web.Stripe
@@ -37,21 +36,11 @@ orderList mp = do
             limit rowsPerPage
             return (o, a)
 
-orderRow :: Entity Order -> Maybe (Entity Address)
-         -> ((Route (HandlerSite (HandlerT App IO)) -> [(Text, Text)] -> Text) -> Html)
+orderRow :: Entity Order -> Maybe (Entity Address) -> Template
 orderRow entity address = do
     let oid = fromSqlKey (entityKey entity)
         row = entityVal entity
     $(hamletFile "templates/order-row.hamlet")
-
-orderRow' :: OrderId -> Handler Html
-orderRow' oid = do
-    d <- getDeploymentId
-    (row, address) <- dbReq $ select $ from $ \(o `LeftOuterJoin` a) -> do
-        on $ o ^. OrderAddress ==. a ?. AddressId
-        where_ $ o ^. OrderDeployment ==. val d &&. o ^. OrderId ==. val oid
-        return (o, a)
-    withUrlRenderer $ orderRow row address
 
 getOrderR :: Handler Html
 getOrderR = do
@@ -77,12 +66,17 @@ getOrderR = do
         | otherwise = 1 : 0 : [page - 3 .. page + 3] ++ [0, num]
 
 updateOrder :: [SqlExpr (Update Order)] -> OrderId -> Handler Json.Value
-updateOrder updates key = do
+updateOrder updates oid = do
     d <- getDeploymentId
     runDB $ update $ \o -> do
         set o updates
-        where_ ( o ^. OrderId ==. val key &&. o ^. OrderDeployment ==. val d )
-    returnJson . renderHtml =<< orderRow' key
+        where_ ( o ^. OrderId ==. val oid &&. o ^. OrderDeployment ==. val d )
+
+    (row, address) <- dbReq $ select $ from $ \(o `LeftOuterJoin` a) -> do
+        on $ o ^. OrderAddress ==. a ?. AddressId
+        where_ $ o ^. OrderDeployment ==. val d &&. o ^. OrderId ==. val oid
+        return (o, a)
+    jsonLayout $ orderRow row address
 
 postAjaxOrderCompleteR :: OrderId -> Handler Json.Value
 postAjaxOrderCompleteR = updateOrder
@@ -126,4 +120,4 @@ getAjaxOrderLinesR order = do
         [] -> returnJson ("No products in this order" :: Text)
         olines -> do
             let total = foldr (\(_, p, q) t -> p * (Money q) + t) 0 olines
-            returnJson . renderHtml =<< withUrlRenderer $(hamletFile "templates/order-lines.hamlet")
+            jsonLayout $(hamletFile "templates/order-lines.hamlet")
