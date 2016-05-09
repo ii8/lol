@@ -112,6 +112,7 @@ library
         , blaze-html
         , vector
         , case-insensitive
+        , time
 
 executable lol
     if flag(library-only)

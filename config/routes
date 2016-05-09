@@ -10,7 +10,7 @@
 /product                ProductR        GET      !manager
 /product/new            ProductNewR     GET POST !manager
 !/product/#ProductId    ProductEditR    GET POST !manager
-/order                  OrderR          GET POST !manager
+/order                  OrderR          GET      !manager
 
 /page                   PageR           GET      !manager
 /page/new               PageNewR            POST !manager
@@ -19,11 +19,12 @@
 /                       HomeR           GET
 !/#Text                 CustomR         GET
 
-/ajax/order/complete/#OrderId      AjaxOrderCompleteR     POST        !manager
-/ajax/order/cancel/#OrderId        AjaxOrderCancelR       POST        !manager
-/ajax/order/refund/#OrderId        AjaxOrderRefundR       POST        !manager
+/ajax/order/complete/#OrderId      AjaxOrderCompleteR         POST        !manager
+/ajax/order/cancel/#OrderId        AjaxOrderCancelR           POST        !manager
+/ajax/order/refund/#OrderId        AjaxOrderRefundR           POST        !manager
+/ajax/order/lines/#OrderId         AjaxOrderLinesR        GET             !manager
 
-/ajax/page/piece/#PieceId          AjaxPagePieceR         POST DELETE !manager
-/ajax/page/data/#PieceId/#Text     AjaxPageDataR          POST        !manager
+/ajax/page/piece/#PieceId          AjaxPagePieceR             POST DELETE !manager
+/ajax/page/data/#PieceId/#Text     AjaxPageDataR              POST        !manager
 
-/ajax/product/available/#ProductId AjaxProductAvailableR  POST        !manager
+/ajax/product/available/#ProductId AjaxProductAvailableR      POST        !manager

@@ -8,5 +8,5 @@ $("input:checkbox").on('change', function()
         alert(status + ": " + msg);
     };
 
-    ajax("/ajax/product/available/" + pid, b, null, fail);
+    ajax_post("/ajax/product/available/" + pid, null, fail, b);
 });

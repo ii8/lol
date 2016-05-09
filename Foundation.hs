@@ -157,6 +157,20 @@ instance YesodPersist App where
         master <- getYesod
         runSqlPool action $ appConnPool master
 
+dbGet :: YesodDB App [a] -> Handler (Maybe a)
+dbGet action = do
+    r <- runDB action
+    return $ case r of
+        (r':[]) -> Just r'
+        _ -> Nothing
+
+dbReq :: YesodDB App [a] -> Handler a
+dbReq action = do
+    r <- runDB action
+    case r of
+        (r':[]) -> return r'
+        _ -> notFound
+
 instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner appConnPool
 

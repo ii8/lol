@@ -1,15 +1,42 @@
 
+function fail(status, msg)
+{
+    alert(status + ": " + msg);
+}
+
 function call(op, order)
 {
     var success = function(response)
     {
-       $('#order-table').replaceWith(response);
+       $('#order-row-' + order).replaceWith(response);
     };
 
-    var fail = function(status, msg)
+    ajax_post("/ajax/order/" + op + "/" + order, success, fail);
+}
+
+function view_lines(div, order)
+{
+    $(div).children().toggleClass('glyphicon-chevron-down');
+    $(div).children().toggleClass('glyphicon-chevron-up');
+
+    if ($(div).data('open') === true) {
+        $('#order-line-' + order).collapse('hide');
+        $(div).data('open', false);
+        return;
+    }
+
+    if ($(div).data('open') === false) {
+        $('#order-line-' + order).collapse('show');
+        $(div).data('open', true);
+        return;
+    }
+
+    var success = function(response)
     {
-        alert(status + ": " + msg);
+        $('#order-line-' + order).html(response);
+        $('#order-line-' + order).collapse('show');
+        $(div).data('open', true);
     };
 
-    ajax("/ajax/order/" + op + "/" + order, null, success, fail);
+    ajax_get("/ajax/order/lines/" + order, success, fail);
 }

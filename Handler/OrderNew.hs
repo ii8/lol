@@ -145,8 +145,9 @@ saveOrder :: Bool -> Bool -> Phone -> Maybe AddressId -> Maybe ChargeId -> Handl
 saveOrder card deliver p ma charge = do
     d <- getDeploymentId
     u <- maybeAuthId
+    time <- liftIO getCurrentTime
     let payment = if card then Paid else Payable
-    o <- runDB $ insert $ Order d u card deliver New payment ma p charge
+    o <- runDB $ insert $ Order d u card deliver New payment ma p charge time
     ps <- query
     _ <- forM ps $ \(pid, _, c, q) ->
         runDB $ insert $ OrderLine o pid c q

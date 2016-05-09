@@ -61,7 +61,7 @@ layout widget = do
     let csrfHeader = Json.toJSON $ decodeUtf8 $ CI.original defaultCsrfHeaderName
 
     pc <- widgetToPageContent $ do
-        addStylesheet $ StaticR global_css_bootstrap_css
+        addStylesheet $ StaticR global_css_bootstrap_min_css
         addStylesheet $ StaticR global_css_base_css
         addStylesheet $ local domain ["css", "style.css"]
         addScript $ StaticR global_js_jquery_1_11_3_min_js

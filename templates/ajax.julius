@@ -1,12 +1,17 @@
 
-function ajax(url, data, success, error)
+function ajax(method, url, success, error, data)
 {
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', url);
+
+    xhr.open(method, url);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('Accept', 'application/json');
     xhr.setRequestHeader(#{csrfHeader}, #{token});
-    xhr.onload = function() {
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState != xhr.DONE)
+            return;
+
         if (xhr.status === 200) {
             var r;
             try {
@@ -20,5 +25,22 @@ function ajax(url, data, success, error)
             error(xhr.status, xhr.responseText);
         }
     };
-    xhr.send(JSON.stringify(data));
+
+    if (data === undefined)
+        xhr.send();
+    else
+        xhr.send(JSON.stringify(data));
+}
+
+function ajax_post(url, success, error, data)
+{
+    if (data === undefined)
+        data = null;
+
+    return ajax('POST', url, success, error, data);
+}
+
+function ajax_get(url, success, error)
+{
+    return ajax('GET', url, success, error);
 }

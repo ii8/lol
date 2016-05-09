@@ -7,3 +7,9 @@
 .login .btn {
   margin-top: 5px;
 }
+
+/* All links in a pager should have equal width */
+.pagination > li > a,
+.pagination > li > span {
+  width: 40px;
+}

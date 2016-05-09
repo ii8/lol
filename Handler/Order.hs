@@ -1,10 +1,10 @@
 
 module Handler.Order
     ( getOrderR
-    , postOrderR
     , postAjaxOrderCompleteR
     , postAjaxOrderCancelR
     , postAjaxOrderRefundR
+    , getAjaxOrderLinesR
     ) where
 
 import Import
@@ -16,98 +16,65 @@ import Web.Stripe
 import Web.Stripe.Refund
 import Network.HTTP.Types.Status (badRequest400)
 
-orderList :: Handler [
-    ( Value OrderId
-    , Value Phone
-    , Value Bool
-    , Value Bool
-    , Value OrderStatus
-    , Value PaymentStatus
-    , Maybe (Entity Address)
-    )]
-orderList = do
+rowsPerPage :: Int64
+rowsPerPage = 20
+
+orderList :: Maybe Int -> Handler [(Entity Order, Maybe (Entity Address))]
+orderList mp = do
     d <- getDeploymentId
-    runDB $ select $ from $ \(o `LeftOuterJoin` a) -> do
+    case mp of
+        Just page -> runDB $ select $ from $ \(o `LeftOuterJoin` a) -> do
+            on $ o ^. OrderAddress ==. a ?. AddressId
+            where_ $ o ^. OrderDeployment ==. val d
+            orderBy [desc (o ^. OrderOrderDate)]
+            limit rowsPerPage
+            offset $ (fromIntegral page - 1) * rowsPerPage
+            return (o, a)
+        _ -> runDB $ select $ from $ \(o `LeftOuterJoin` a) -> do
+            on $ o ^. OrderAddress ==. a ?. AddressId
+            where_ $ o ^. OrderDeployment ==. val d
+            orderBy [desc (o ^. OrderStatus ==. val New), desc (o ^. OrderOrderDate)]
+            limit rowsPerPage
+            return (o, a)
+
+orderRow :: Entity Order -> Maybe (Entity Address)
+         -> ((Route (HandlerSite (HandlerT App IO)) -> [(Text, Text)] -> Text) -> Html)
+orderRow entity address = do
+    let oid = fromSqlKey (entityKey entity)
+        row = entityVal entity
+    $(hamletFile "templates/order-row.hamlet")
+
+orderRow' :: OrderId -> Handler Html
+orderRow' oid = do
+    d <- getDeploymentId
+    (row, address) <- dbReq $ select $ from $ \(o `LeftOuterJoin` a) -> do
         on $ o ^. OrderAddress ==. a ?. AddressId
-        where_ $ o ^. OrderDeployment ==. val d
-        return
-            ( o ^. OrderId
-            , o ^. OrderPhone
-            , o ^. OrderCard
-            , o ^. OrderDeliver
-            , o ^. OrderStatus
-            , o ^. OrderPayment
-            , a
-            )
-
-addressList :: Handler (OptionList AddressId)
-addressList = do
-    d <- getDeploymentId
-    as <- runDB $ select $ from $ \(da `InnerJoin` a) -> do
-        on $ da ^. DeploymentAddressAddress ==. a ^. AddressId
-        where_ (da ^. DeploymentAddressDeployment ==. (val d))
-        return (a ^. AddressName, a ^. AddressPostcode, a ^. AddressId)
-    optionsPairs $ fmap (\(a, b, c) ->
-        (maybe "" (flip mappend ", ") (unValue a) <> unValue b
-        , unValue c)) as
-
-orderTable :: Handler Html
-orderTable = do
-    rows <- orderList
-    withUrlRenderer $(hamletFile "templates/order-table.hamlet")
-
-formOrder :: Maybe Order -> Form Order
-formOrder o = renderDivs $ Order
-    <$> lift getDeploymentId
-    <*> pure Nothing
-    <*> areq (radioField cardList) "Payment Method" (orderCard <$> o)
-    <*> areq (radioField deliverList) "Collect or deliver" (orderDeliver <$> o)
-    <*> areq (radioField optionsEnum) "Order Status" (Just $ maybe New orderStatus o)
-    <*> areq (radioField optionsEnum) "Payment Status" (Just $ maybe Payable orderPayment o)
-    <*> aopt (selectField addressList) "Address" (orderAddress <$> o)
-    <*> areq phoneField "Phone number" (orderPhone <$> o)
-    <*> pure Nothing
-  where
-    cardList = optionsPairs [("Cash" :: Text, False), ("Card", True)]
-    deliverList = optionsPairs [("Collect" :: Text, False), ("Deliver", True)]
-
-formAddr :: Maybe Address -> Form Address
-formAddr a = renderDivs $ Address
-    <$> aopt textField "Name" (addressName <$> a)
-    <*> areq textField "Address Line 1" (addressLineone <$> a)
-    <*> aopt textField "Address Line 2" (addressLinetwo <$> a)
-    <*> areq textField "Town" (addressTown <$> a)
-    <*> areq textField "County" (addressCounty <$> a)
-    <*> areq textField "Postcode" (addressPostcode <$> a)
+        where_ $ o ^. OrderDeployment ==. val d &&. o ^. OrderId ==. val oid
+        return (o, a)
+    withUrlRenderer $ orderRow row address
 
 getOrderR :: Handler Html
 getOrderR = do
-    ((ofr, ofw), oenc) <- runFormPost $ identifyForm "order" $ formOrder Nothing
-    ((afr, afw), aenc) <- runFormPost $ identifyForm "addr" $ formAddr Nothing
-    case afr of
-        FormSuccess a -> do
-            d <- getDeploymentId
-            aid <- runDB $ insert a
-            void $ runDB $ insert $ DeploymentAddress d aid
-        _ -> return ()
-    case ofr of
-        FormSuccess o -> do
-            aid <- maybe
-                (return Nothing)
-                (\aid -> return . Just =<< duplicate aid)
-                (orderAddress o)
-            let o' = o { orderAddress = aid }
-            void $ runDB $ insert o'
-        _ -> return ()
-    table <- orderTable
+    d <- getDeploymentId
+    Value n <- dbReq $ select $ from $ \o -> do
+        where_ $ o ^. OrderDeployment ==. val d
+        return countRows
+    hmp <- lookupGetParam "page"
+
+    let (n', r) = n `quotRem` rowsPerPage
+        num = fromIntegral $ if r > 0 then n' + 1 else n'
+        valid x
+            | x == 0 || x > num = Nothing
+            | otherwise = Just (fromIntegral x)
+        mp = valid =<< parseUnsigned =<< hmp
+    rows <- orderList mp
     defaultLayout $(widgetFile "order")
   where
-    duplicate aid = do
-        a <- runDB $ get404 aid
-        runDB $ insert a
-
-postOrderR :: Handler Html
-postOrderR = getOrderR
+    list page num
+        | num < 14 = [1 .. num]
+        | page <= 5 = [1 .. 9] ++ [0, num]
+        | page >= num - 4 = 1 : 0 : [num - 8 .. num]
+        | otherwise = 1 : 0 : [page - 3 .. page + 3] ++ [0, num]
 
 updateOrder :: [SqlExpr (Update Order)] -> OrderId -> Handler Json.Value
 updateOrder updates key = do
@@ -115,7 +82,7 @@ updateOrder updates key = do
     runDB $ update $ \o -> do
         set o updates
         where_ ( o ^. OrderId ==. val key &&. o ^. OrderDeployment ==. val d )
-    returnJson . renderHtml =<< orderTable
+    returnJson . renderHtml =<< orderRow' key
 
 postAjaxOrderCompleteR :: OrderId -> Handler Json.Value
 postAjaxOrderCompleteR = updateOrder
@@ -146,3 +113,17 @@ postAjaxOrderRefundR key = do
     doUpdate = updateOrder
         [ OrderStatus =. val Cancelled
         , OrderPayment =. val Refunded ] key
+
+getAjaxOrderLinesR :: OrderId -> Handler Json.Value
+getAjaxOrderLinesR order = do
+    d <- getDeploymentId
+    r <- runDB $ select $ from $ \(o `InnerJoin` l `InnerJoin` p) -> do
+        on $ p ^. ProductId ==. l ^. OrderLineProduct
+        on $ l ^. OrderLineOrder ==. o ^. OrderId
+        where_ $ o ^. OrderId ==. val order &&. o ^. OrderDeployment ==. val d
+        return ( p ^. ProductName, l ^. OrderLinePrice, l ^. OrderLineQuantity )
+    case fmap unValue3 r of
+        [] -> returnJson ("No products in this order" :: Text)
+        olines -> do
+            let total = foldr (\(_, p, q) t -> p * (Money q) + t) 0 olines
+            returnJson . renderHtml =<< withUrlRenderer $(hamletFile "templates/order-lines.hamlet")

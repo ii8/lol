@@ -70,6 +70,7 @@ Order
     address AddressId Maybe
     phone Phone
     charge ChargeId Maybe
+    orderDate UTCTime
 OrderLine
     order OrderId
     product ProductId

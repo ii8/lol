@@ -1,6 +1,7 @@
 module Model where
 
 import BasicPrelude
+import Data.Time
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.TH
 

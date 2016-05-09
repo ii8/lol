@@ -12,7 +12,7 @@
         <tbody>
         $forall (key, product, price, quantity) <- rows
           <tr><td>#{fromSqlKey key}</td><td>#{product}</td><td>#{price}</td><td>#{quantity}</td>
-            
+
       <form id="co-form" action="@{OrderNewR}" method="POST">
         ^{fw}
         ^{co}
