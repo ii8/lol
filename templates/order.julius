@@ -16,6 +16,9 @@ function call(op, order)
 
 function view_lines(div, order)
 {
+    if ($('#order-line-' + order).hasClass('collapsing'))
+        return;
+
     $(div).children().toggleClass('glyphicon-chevron-down');
     $(div).children().toggleClass('glyphicon-chevron-up');
 
@@ -40,3 +43,24 @@ function view_lines(div, order)
 
     ajax_get("/ajax/order/lines/" + order, success, fail);
 }
+
+var latest_order_id = #{toJSON latestId};
+$(function()
+{
+    if(#{isJust mp})
+        return;
+
+    var success = function(response)
+    {
+        if (latest_order_id >= response.latest)
+            return;
+
+        latest_order_id = response.latest;
+        $('#order-table-body').prepend(response.html);
+    };
+
+    setInterval(function()
+    {
+        ajax_get("/ajax/order/new/" + latest_order_id, success, fail);
+    }, 20000);
+});

@@ -23,6 +23,7 @@
 /ajax/order/cancel/#OrderId        AjaxOrderCancelR           POST        !manager
 /ajax/order/refund/#OrderId        AjaxOrderRefundR           POST        !manager
 /ajax/order/lines/#OrderId         AjaxOrderLinesR        GET             !manager
+/ajax/order/new/#OrderId           AjaxOrderNewR          GET             !manager
 
 /ajax/page/piece/#PieceId          AjaxPagePieceR             POST DELETE !manager
 /ajax/page/data/#PieceId/#Text     AjaxPageDataR              POST        !manager

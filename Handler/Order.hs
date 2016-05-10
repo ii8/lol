@@ -5,6 +5,7 @@ module Handler.Order
     , postAjaxOrderCancelR
     , postAjaxOrderRefundR
     , getAjaxOrderLinesR
+    , getAjaxOrderNewR
     ) where
 
 import Import
@@ -18,23 +19,31 @@ import Network.HTTP.Types.Status (badRequest400)
 rowsPerPage :: Int64
 rowsPerPage = 20
 
-orderList :: Maybe Int -> Handler [(Entity Order, Maybe (Entity Address))]
-orderList mp = do
-    d <- getDeploymentId
+orderList :: Maybe Int -> DeploymentId -> SqlPersistT Handler [(Entity Order, Maybe (Entity Address))]
+orderList mp d = do
     case mp of
-        Just page -> runDB $ select $ from $ \(o `LeftOuterJoin` a) -> do
+        Just page -> select $ from $ \(o `LeftOuterJoin` a) -> do
             on $ o ^. OrderAddress ==. a ?. AddressId
             where_ $ o ^. OrderDeployment ==. val d
             orderBy [desc (o ^. OrderOrderDate)]
             limit rowsPerPage
             offset $ (fromIntegral page - 1) * rowsPerPage
             return (o, a)
-        _ -> runDB $ select $ from $ \(o `LeftOuterJoin` a) -> do
+        _ -> select $ from $ \(o `LeftOuterJoin` a) -> do
             on $ o ^. OrderAddress ==. a ?. AddressId
             where_ $ o ^. OrderDeployment ==. val d
             orderBy [desc (o ^. OrderStatus ==. val New), desc (o ^. OrderOrderDate)]
             limit rowsPerPage
             return (o, a)
+
+latestOrder :: DeploymentId -> SqlPersistT Handler OrderId
+latestOrder d = do
+    r <- select $ from $ \o -> do
+        where_ $ o ^. OrderDeployment ==. val d
+        return $ max_ (o ^. OrderId)
+    return $ case r of
+        (Value oid:[]) -> maybe (toSqlKey 0) id oid
+        _ -> toSqlKey 0
 
 orderRow :: Entity Order -> Maybe (Entity Address) -> Template
 orderRow entity address = do
@@ -56,7 +65,10 @@ getOrderR = do
             | x == 0 || x > num = Nothing
             | otherwise = Just (fromIntegral x)
         mp = valid =<< parseUnsigned =<< hmp
-    rows <- orderList mp
+    (latestId, rows) <- runDB $ do
+        r' <- orderList mp d
+        l <- latestOrder d
+        return (l, r')
     defaultLayout $(widgetFile "order")
   where
     list page num
@@ -121,3 +133,17 @@ getAjaxOrderLinesR order = do
         olines -> do
             let total = foldr (\(_, p, q) t -> p * (Money q) + t) 0 olines
             jsonLayout $(hamletFile "templates/order-lines.hamlet")
+
+getAjaxOrderNewR :: OrderId -> Handler Json.Value
+getAjaxOrderNewR oid = do
+    d <- getDeploymentId
+    (latest, rows) <- runDB $ do
+        r <- select $ from $ \(o `LeftOuterJoin` a) -> do
+            on $ o ^. OrderAddress ==. a ?. AddressId
+            where_ $ o ^. OrderDeployment ==. val d &&. o ^. OrderId >. val oid
+            orderBy [desc (o ^. OrderOrderDate)]
+            return (o, a)
+        l <- latestOrder d
+        return (l, r)
+    pairs <- jsonLayout $(hamletFile "templates/order-rowpair.hamlet")
+    return $ Json.object ["latest" .= latest, "html" .= pairs]
