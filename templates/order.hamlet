@@ -10,7 +10,8 @@
         <th>Phone number
         <th>Payment
         <th>Delivery
-        <th>Address
+        <th>Name
+        <th>Email
         <th>Action
         <th>
     <tbody id="order-table-body">
@@ -18,7 +19,7 @@
         $with oid <- fromSqlKey $ entityKey row
           ^{orderRow row address}
           <tr>
-            <td colspan="7" style="padding: 0px;">
+            <td colspan="8" style="padding: 0px;">
               <div id="order-line-#{oid}" class="accordion-body collapse">
 
   $maybe page <- mp

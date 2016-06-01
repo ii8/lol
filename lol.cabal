@@ -23,6 +23,7 @@ library
         Import.Cookie
         Import.Money
         Import.Phone
+        Import.Address
         Import.Charge
         Import.Message
         Import.Layout

@@ -15,6 +15,7 @@ import qualified Data.Aeson as Json
 import Web.Stripe
 import Web.Stripe.Refund
 import Network.HTTP.Types.Status (badRequest400)
+import Text.Blaze.Html.Renderer.Text (renderHtml)
 
 rowsPerPage :: Int64
 rowsPerPage = 20

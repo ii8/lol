@@ -6,9 +6,26 @@ function fail(status, msg)
 
 function call(op, order)
 {
+    var div = $('#order-row-chev-' + order);
+    var open = false;
+    var closed = false;
+
+    if (div.data('open') === true)
+        open = true;
+    else if (div.data('open') === false)
+        closed = true;
+
     var success = function(response)
     {
-       $('#order-row-' + order).replaceWith(response);
+        $('#order-row-' + order).replaceWith(response);
+        if (open) {
+            var div = $('#order-row-chev-' + order);
+            div.children().toggleClass('glyphicon-chevron-down');
+            div.children().toggleClass('glyphicon-chevron-up');
+            div.data('open', true);
+        } else if (closed) {
+            $('#order-row-chev-' + order).data('open', false);
+        }
     };
 
     ajax_post("/ajax/order/" + op + "/" + order, success, fail);
@@ -47,6 +64,14 @@ function view_lines(div, order)
 var latest_order_id = #{toJSON latestId};
 $(function()
 {
+    $('body').popover({
+        selector: '[data-toggle="popover"]',
+        title: "Address",
+        trigger: "focus hover",
+        placement: "bottom",
+        html: true
+    });
+
     if(#{isJust mp})
         return;
 

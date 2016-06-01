@@ -69,6 +69,7 @@ Order
     payment PaymentStatus
     address AddressId Maybe
     phone Phone
+    email Text
     charge ChargeId Maybe
     orderDate UTCTime
 OrderLine

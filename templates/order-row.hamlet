@@ -33,12 +33,12 @@ $with active <- (orderStatus row) == New
     $else
       <td>Collect
     $maybe Entity _ a <- address
-      $maybe name <- addressName a
-        <td>#{name}
-      $nothing
-        <td>Not given
+      $with name <- maybe "Not Given" id $ addressName a
+        <td>
+          <a tabindex="0" role="button" data-toggle="popover" data-content="#{renderHtml (toHtml a)}">#{name}
     $nothing
       <td>None
+    <td>#{orderEmail row}
     <td>
       $case orderStatus row
         $of New
@@ -48,5 +48,5 @@ $with active <- (orderStatus row) == New
           <button onclick="call('refund', #{oid})">Refund
         $of Cancelled
     <td>
-      <div style="cursor: context-menu" onclick="view_lines(this, #{oid})">
+      <div id="order-row-chev-#{oid}" style="cursor: context-menu" onclick="view_lines(this, #{oid})">
         <span class="pull-right glyphicon glyphicon-chevron-down">

@@ -2,5 +2,5 @@ $forall (row, address) <- rows
   $with oid <- fromSqlKey $ entityKey row
     ^{orderRow row address}
     <tr>
-      <td colspan="7" style="padding: 0px;">
+      <td colspan="8" style="padding: 0px;">
         <div id="order-line-#{oid}" class="accordion-body collapse">
