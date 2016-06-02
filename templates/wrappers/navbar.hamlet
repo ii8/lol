@@ -1,10 +1,9 @@
 <header class="container-fluid">
   <div class="container main-container">
     <div class="col-md-4">
-      <h1 class="logo">
-        <img src="@{local domain ["img", "logo.png"]}">
+      <img src="@{local domain ["img", "logo.png"]}" alt="Logo">
     <div class="col-md-8">
-      <nav class="navbar navbar-simple" role="navigation">
+      <nav class="navbar navbar-simple">
         <div class="container-fluid navbar-inner">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">

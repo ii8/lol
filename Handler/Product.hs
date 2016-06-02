@@ -54,7 +54,7 @@ cform = renderDivs $ Category
 getProductR :: Handler Html
 getProductR = do
     ps <- queryProudctList
-    defaultLayout $(widgetFile "product-list")
+    defaultLayout $ setTitle "Products" >> $(widgetFile "product-list")
 
 getProductNewR :: Handler Html
 getProductNewR = do
@@ -64,7 +64,7 @@ getProductNewR = do
             _ <- runDB $ insert p
             addMessage "success" "Created new product"
             redirect ProductR
-        _ -> defaultLayout $(widgetFile "product-new")
+        _ -> defaultLayout $ setTitle "New Product" >> $(widgetFile "product-new")
 
 postProductNewR :: Handler Html
 postProductNewR = getProductNewR
@@ -81,7 +81,7 @@ getProductEditR key = do
                     runDB $ replace key new
                     addMessage "success" "Product Updated"
                     redirect ProductR
-                _ -> defaultLayout $(widgetFile "product-edit")
+                _ -> defaultLayout $ setTitle "Edit Product" >> $(widgetFile "product-edit")
 
 postProductEditR :: Key Product -> Handler Html
 postProductEditR key = getProductEditR key

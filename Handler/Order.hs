@@ -70,7 +70,7 @@ getOrderR = do
         r' <- orderList mp d
         l <- latestOrder d
         return (l, r')
-    defaultLayout $(widgetFile "order")
+    defaultLayout $ setTitle "Orders" >> $(widgetFile "order")
   where
     list page num
         | num < 14 = [1 .. num]

@@ -51,14 +51,14 @@ getPageR :: Handler Html
 getPageR = do
     ps <- queryPages
     (widget, enc) <- generateFormPost form
-    defaultLayout $(widgetFile "page")
+    defaultLayout $ setTitle "Pages" >> $(widgetFile "page")
 
 postPageNewR :: Handler Html
 postPageNewR = do
     ((result, widget), enc) <- runFormPost form
     case result of
         FormSuccess name -> newPage name >>= redirect . PageEditR
-        _ -> queryPages >>= \ps -> defaultLayout $(widgetFile "page")
+        _ -> queryPages >>= \ps -> defaultLayout (setTitle "Pages" >> $(widgetFile "page"))
   where
     newPage name = do
         d <- getDeploymentId
@@ -69,6 +69,7 @@ getPageEditR :: PageId -> Handler Html
 getPageEditR pid = do
     page <- queryPage
     defaultLayout $ do
+        setTitle $ "Edit " <> (toHtml $ pageName page)
         $(widgetFile "page-edit")
         renderPiece $ pagePiece page
   where
