@@ -75,6 +75,7 @@ layout widget = do
     <meta charset="UTF-8">
     <title>#{pageTitle pc}
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="@{local domain ["img", "favicon.ico"]}">
     ^{pageHead pc}
   <body>
     ^{pageBody pc}
