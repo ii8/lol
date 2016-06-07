@@ -7,7 +7,6 @@
 .login .btn {
   margin-top: 5px;
 }
-
 .laxus { margin-top: 20px; }
 
 .btn-green {
@@ -54,4 +53,9 @@ fieldset[disabled] .btn-green.active {
 .btn-green .badge {
   color: #319400;
   background-color: #ffffff;
+}
+/* All links in a pager should have equal width */
+.pagination > li > a,
+.pagination > li > span {
+  width: 40px;
 }

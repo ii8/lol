@@ -75,7 +75,7 @@ layout widget = do
     let csrfHeader = Json.toJSON $ decodeUtf8 $ CI.original defaultCsrfHeaderName
 
     pc <- widgetToPageContent $ do
-        addStylesheet $ StaticR global_css_bootstrap_css
+        addStylesheet $ StaticR global_css_bootstrap_min_css
         addStylesheet $ StaticR global_css_base_css
         addStylesheet $ local domain ["css", "style.css"]
         addScript $ StaticR global_js_jquery_1_11_3_min_js
@@ -89,6 +89,7 @@ layout widget = do
     <meta charset="UTF-8">
     <title>#{pageTitle pc}
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="@{local domain ["img", "favicon.ico"]}">
     ^{pageHead pc}
   <body>
     ^{pageBody pc}

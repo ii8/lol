@@ -1,0 +1,52 @@
+$with active <- (orderStatus row) == New
+  <tr id="order-row-#{oid}" :active:.active>
+    $case orderStatus row
+      $of New
+        <td>New Order
+      $of Complete
+        <td>Completed
+      $of Cancelled
+        <td>Cancelled
+    <td>#{orderPhone row}
+    $if orderCard row
+      $case orderPayment row
+        $of Payable
+          <td>To be paid with card
+        $of Paid
+          <td>Paid with card
+        $of Unpaid
+          <td>No payment
+        $of Refunded
+          <td>Refunded
+    $else
+      $case orderPayment row
+        $of Payable
+          <td>To be paid with cash
+        $of Paid
+          <td>Paid with cash
+        $of Unpaid
+          <td>No payment
+        $of Refunded
+          <td>Cash refunded
+    $if orderDeliver row
+      <td>Deliver
+    $else
+      <td>Collect
+    $maybe Entity _ a <- address
+      $with name <- maybe "Not Given" id $ addressName a
+        <td>
+          <a tabindex="0" role="button" data-toggle="popover" data-content="#{renderHtml (toHtml a)}">#{name}
+    $nothing
+      <td>None
+    <td>#{orderEmail row}
+    <td>
+      $case orderStatus row
+        $of New
+          <button onclick="call('complete', #{oid})">Complete
+          <button onclick="call('cancel', #{oid})">Cancel
+        $of Complete
+          <button onclick="call('refund', #{oid})">Refund
+        $of Cancelled
+    <td>
+      <div id="order-row-chev-#{oid}" style="cursor: context-menu" onclick="view_lines(this, #{oid})">
+        <span class="pull-right glyphicon glyphicon-chevron-down">

@@ -1,0 +1,13 @@
+<table id="order-table" class="table table-hover">
+  <thead>
+    <tr>
+      <th>Product
+      <th>Price (at time ordered)
+      <th>Quantity
+  <tbody>
+    $forall (name, price, quantity) <- olines
+      <tr>
+        <td>#{name}
+        <td>#{price}
+        <td>#{quantity}
+<span>Total: #{total}

@@ -51,14 +51,14 @@ getPageR :: Handler Html
 getPageR = do
     ps <- queryPages
     (widget, enc) <- generateFormPost form
-    defaultLayout $(widgetFile "page")
+    defaultLayout $ setTitle "Pages" >> $(widgetFile "page")
 
 postPageNewR :: Handler Html
 postPageNewR = do
     ((result, widget), enc) <- runFormPost form
     case result of
         FormSuccess name -> newPage name >>= redirect . PageEditR
-        _ -> queryPages >>= \ps -> defaultLayout $(widgetFile "page")
+        _ -> queryPages >>= \ps -> defaultLayout (setTitle "Pages" >> $(widgetFile "page"))
   where
     newPage name = do
         d <- getDeploymentId
@@ -69,6 +69,7 @@ getPageEditR :: PageId -> Handler Html
 getPageEditR pid = do
     page <- queryPage
     defaultLayout $ do
+        setTitle $ "Edit " <> (toHtml $ pageName page)
         $(widgetFile "page-edit")
         renderPiece $ pagePiece page
   where
@@ -95,17 +96,14 @@ postAjaxPagePieceR pid = do
 
 deleteAjaxPagePieceR :: PieceId -> Handler Json.Value
 deleteAjaxPagePieceR pid = do
-    r <- runDB $ select $ from $ \(piece `LeftOuterJoin` page) -> do
+    (Value pd, Value mp) <- dbReq $ select $ from $ \(piece `LeftOuterJoin` page) -> do
         on $ just (piece ^. PieceId) ==. page ?. PagePiece
         where_ $ piece ^. PieceId ==. val pid
         return ( piece ^. PieceDeployment, page ?. PageId )
 
-    case r of
-        ((Value pd, Value mp):_) -> do
-            d <- getDeploymentId
-            when (isJust mp) (sendResponseStatus conflict409 ())
-            when (pd /= d) notFound
-        _ -> notFound
+    d <- getDeploymentId
+    when (isJust mp) (sendResponseStatus conflict409 ())
+    when (pd /= d) notFound
 
     runDB $ do
         delete $ from $ \p -> do

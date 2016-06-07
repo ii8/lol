@@ -49,13 +49,16 @@ address a = Address
     <*> areq textField "County" (addressCounty <$> a)
     <*> areq textField "Postcode" (addressPostcode <$> a)
 
-bothForm :: Maybe (Address, Phone) -> Form (Address, Phone)
-bothForm m = renderDivs $ (,)
-    <$> address (fst <$> m)
-    <*> areq phoneField "Phone Number" (snd <$> m)
+bothForm :: Maybe (Address, Phone, Text) -> Form (Address, Phone, Text)
+bothForm m = renderDivs $ (,,)
+    <$> address ((\(x, _, _) -> x) <$> m)
+    <*> areq phoneField "Phone Number" ((\(_, x, _) -> x) <$> m)
+    <*> areq emailField "Email Address" ((\(_, _, x) -> x) <$> m)
 
-phoneForm :: Maybe Phone -> Form Phone
-phoneForm p = renderDivs $ areq phoneField "Phone Number" p
+phoneForm :: Maybe (Phone, Text) -> Form (Phone, Text)
+phoneForm m = renderDivs $ (,)
+    <$> areq phoneField "Phone Number" (fst <$> m)
+    <*> areq emailField "Email Address" (snd <$> m)
 
 checkout :: Int -> Money -> Widget
 checkout num (Money amount) = do
@@ -126,27 +129,28 @@ postOrderCollect :: Handler Html
 postOrderCollect = do
     ((fr, fw), _) <- runFormPost $ phoneForm Nothing
     case fr of
-        FormSuccess phone -> do
+        FormSuccess (phone, email) -> do
             mcharge <- handlePayment
-            saveOrder (isJust mcharge) False phone Nothing mcharge
+            saveOrder (isJust mcharge) False phone email Nothing mcharge
         _ -> handleOrder $ Just fw
 
 postOrderDeliver :: Handler Html
 postOrderDeliver = do
     ((fr, fw), _) <- runFormPost $ bothForm Nothing
     case fr of
-        FormSuccess (addr, phone) -> do
+        FormSuccess (addr, phone, email) -> do
             mcharge <- handlePayment
             aid <- runDB $ insert addr
-            saveOrder (isJust mcharge) True phone (Just aid) mcharge
+            saveOrder (isJust mcharge) True phone email (Just aid) mcharge
         _ -> handleOrder $ Just fw
 
-saveOrder :: Bool -> Bool -> Phone -> Maybe AddressId -> Maybe ChargeId -> Handler Html
-saveOrder card deliver p ma charge = do
+saveOrder :: Bool -> Bool -> Phone -> Text -> Maybe AddressId -> Maybe ChargeId -> Handler Html
+saveOrder card deliver p email ma charge = do
     d <- getDeploymentId
     u <- maybeAuthId
+    time <- liftIO getCurrentTime
     let payment = if card then Paid else Payable
-    o <- runDB $ insert $ Order d u card deliver New payment ma p charge
+    o <- runDB $ insert $ Order d u card deliver New payment ma p email charge time
     ps <- query
     _ <- forM ps $ \(pid, _, c, q) ->
         runDB $ insert $ OrderLine o pid c q

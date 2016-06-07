@@ -1,15 +1,91 @@
 
+function fail(status, msg)
+{
+    alert(status + ": " + msg);
+}
+
 function call(op, order)
 {
+    var div = $('#order-row-chev-' + order);
+    var open = false;
+    var closed = false;
+
+    if (div.data('open') === true)
+        open = true;
+    else if (div.data('open') === false)
+        closed = true;
+
     var success = function(response)
     {
-       $('#order-table').replaceWith(response);
+        $('#order-row-' + order).replaceWith(response);
+        if (open) {
+            var div = $('#order-row-chev-' + order);
+            div.children().toggleClass('glyphicon-chevron-down');
+            div.children().toggleClass('glyphicon-chevron-up');
+            div.data('open', true);
+        } else if (closed) {
+            $('#order-row-chev-' + order).data('open', false);
+        }
     };
 
-    var fail = function(status, msg)
-    {
-        alert(status + ": " + msg);
-    };
-
-    ajax("/ajax/order/" + op + "/" + order, null, success, fail);
+    ajax_post("/ajax/order/" + op + "/" + order, success, fail);
 }
+
+function view_lines(div, order)
+{
+    if ($('#order-line-' + order).hasClass('collapsing'))
+        return;
+
+    $(div).children().toggleClass('glyphicon-chevron-down');
+    $(div).children().toggleClass('glyphicon-chevron-up');
+
+    if ($(div).data('open') === true) {
+        $('#order-line-' + order).collapse('hide');
+        $(div).data('open', false);
+        return;
+    }
+
+    if ($(div).data('open') === false) {
+        $('#order-line-' + order).collapse('show');
+        $(div).data('open', true);
+        return;
+    }
+
+    var success = function(response)
+    {
+        $('#order-line-' + order).html(response);
+        $('#order-line-' + order).collapse('show');
+        $(div).data('open', true);
+    };
+
+    ajax_get("/ajax/order/lines/" + order, success, fail);
+}
+
+var latest_order_id = #{toJSON latestId};
+$(function()
+{
+    $('body').popover({
+        selector: '[data-toggle="popover"]',
+        title: "Address",
+        trigger: "focus hover",
+        placement: "bottom",
+        html: true
+    });
+
+    if(#{isJust mp})
+        return;
+
+    var success = function(response)
+    {
+        if (latest_order_id >= response.latest)
+            return;
+
+        latest_order_id = response.latest;
+        $('#order-table-body').prepend(response.html);
+    };
+
+    setInterval(function()
+    {
+        ajax_get("/ajax/order/new/" + latest_order_id, success, fail);
+    }, 20000);
+});

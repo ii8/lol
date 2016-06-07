@@ -21,9 +21,11 @@
                   <input type="hidden" class="productName" value="#{product}">
                   <input type="hidden" class="productPrice" value="#{money}">
                   <div class="btn-group">
-                    <a class="btn btn-default btn-sm" onclick="menu_mod(#{key}, 1)"><div class="glyphicon glyphicon-plus"></div></a>
-                    <input type="text" readonly="readonly" class="quantity-input" value="0" id="quantity-display-#{key}" />
-                    <a class="btn btn-default btn-sm" onclick="menu_mod(#{key}, -1)"><div class="glyphicon glyphicon-minus"></div></a>
+                    <a class="btn btn-default btn-sm" onclick="menu_mod(#{key}, 1)">
+                      <div class="glyphicon glyphicon-plus">
+                    <input type="text" readonly="readonly" class="quantity-input" value="0" id="quantity-display-#{key}">
+                    <a class="btn btn-default btn-sm" onclick="menu_mod(#{key}, -1)">
+                      <div class="glyphicon glyphicon-minus">
 
     <div class="col-md-4">
       <div class="affix basket-container">

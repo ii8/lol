@@ -1,13 +1,60 @@
 <div class="container main-container">
-  <h1>Recent Orders
-  ^{table}
+  $maybe page <- mp
+    <h1>Orders Page #{page}
+  $nothing
+    <h1>Recent Orders
+  <table id="order-table" class="table">
+    <thead>
+      <tr>
+        <th>Status
+        <th>Phone number
+        <th>Payment
+        <th>Delivery
+        <th>Name
+        <th>Email
+        <th>Action
+        <th>
+    <tbody id="order-table-body">
+      $forall (row, address) <- rows
+        $with oid <- fromSqlKey $ entityKey row
+          ^{orderRow row address}
+          <tr>
+            <td colspan="8" style="padding: 0px;">
+              <div id="order-line-#{oid}" class="accordion-body collapse">
 
-  <div class="col-md-4">
-    <form method="post" enctype=#{aenc}>
-      ^{afw}
-      <input type="submit" class="btn btn-green" value="New Address">
-
-  <div class="col-md-4">
-    <form method="post" enctype=#{oenc}>
-      ^{ofw}
-      <input type="submit" class="btn btn-green" value="New Order">
+  $maybe page <- mp
+    <nav>
+      <div .text-center>
+        <ul class="pagination">
+          $if page == 1
+            <li .disabled>
+              <span .glyphicon .glyphicon-menu-left>
+          $else
+            <li>
+              <a href="@?{(OrderR, [("page", show $ page - 1)])}">
+                <span .glyphicon .glyphicon-menu-left>
+          $forall i <- list page num
+            $if i == page
+              <li .active>
+                <span>#{i}
+            $elseif i == 0
+              <li .disabled>
+                <span>..
+            $else
+              <li>
+                <a href="@?{(OrderR, [("page", show i)])}">#{i}
+          $if page == num
+            <li .disabled>
+              <span .glyphicon .glyphicon-menu-right>
+          $else
+            <li>
+              <a href="@?{(OrderR, [("page", show $ page + 1)])}">
+                <span .glyphicon .glyphicon-menu-right>
+      <ul class="pager">
+        <li>
+          <a href="@{OrderR}">View New Orders
+  $nothing
+    <nav>
+      <ul class="pager">
+        <li>
+          <a href="@?{(OrderR, [("page", "1")])}">View All

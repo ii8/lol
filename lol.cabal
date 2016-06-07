@@ -23,6 +23,7 @@ library
         Import.Cookie
         Import.Money
         Import.Phone
+        Import.Address
         Import.Charge
         Import.Message
         Import.Layout
@@ -112,6 +113,7 @@ library
         , blaze-html
         , vector
         , case-insensitive
+        , time
 
 executable lol
     if flag(library-only)
