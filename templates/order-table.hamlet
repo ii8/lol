@@ -46,8 +46,8 @@
         <td>
           $case status
             $of New
-              <button onclick="call('complete', #{fromSqlKey order})">Complete
-              <button onclick="call('cancel', #{fromSqlKey order})">Cancel
+              <button class="btn btn-success" onclick="call('complete', #{fromSqlKey order})">Complete
+              <button class="btn btn-danger" onclick="call('cancel', #{fromSqlKey order})">Cancel
             $of Complete
-              <button onclick="call('refund', #{fromSqlKey order})">Refund
+              <button class="btn btn-danger" onclick="call('refund', #{fromSqlKey order})">Refund
             $of Cancelled

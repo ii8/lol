@@ -7,3 +7,51 @@
 .login .btn {
   margin-top: 5px;
 }
+
+.laxus { margin-top: 20px; }
+
+.btn-green {
+  color: #ffffff;
+  background-color: #319400;
+  border-color: #089900;
+}
+
+.btn-green:hover,
+.btn-green:focus,
+.btn-green:active,
+.btn-green.active,
+.open .dropdown-toggle.btn-green {
+  color: #ffffff;
+  background-color: #00751F;
+  border-color: #089900;
+}
+
+.btn-green:active,
+.btn-green.active,
+.open .dropdown-toggle.btn-green {
+  background-image: none;
+}
+
+.btn-green.disabled,
+.btn-green[disabled],
+fieldset[disabled] .btn-green,
+.btn-green.disabled:hover,
+.btn-green[disabled]:hover,
+fieldset[disabled] .btn-green:hover,
+.btn-green.disabled:focus,
+.btn-green[disabled]:focus,
+fieldset[disabled] .btn-green:focus,
+.btn-green.disabled:active,
+.btn-green[disabled]:active,
+fieldset[disabled] .btn-green:active,
+.btn-green.disabled.active,
+.btn-green[disabled].active,
+fieldset[disabled] .btn-green.active {
+  background-color: #319400;
+  border-color: #089900;
+}
+
+.btn-green .badge {
+  color: #319400;
+  background-color: #ffffff;
+}

@@ -5,7 +5,7 @@
   $if null rows
     <p>No products
   $else
-    <div class="col-md-9">
+    <div class="col-md-8">
       <div class="list-group menu">
         $forall (category, products) <- rows
           <div class="list-group-item">
@@ -14,9 +14,9 @@
           $forall (key, product, price@(Money money)) <- products
             <div class="list-group-item product">
               <div class="container-fluid">
-                <div class="col-sm-10">
+                <div class="col-sm-9">
                   <p>#{product} - #{price}
-                <div id="product#{key}" class="col-md-2 text-right">
+                <div id="product#{key}" class="col-sm-3 text-right">
                   <input type="hidden" class="productId" value="#{key}">
                   <input type="hidden" class="productName" value="#{product}">
                   <input type="hidden" class="productPrice" value="#{money}">
@@ -25,7 +25,7 @@
                     <input type="text" readonly="readonly" class="quantity-input" value="0" id="quantity-display-#{key}" />
                     <a class="btn btn-default btn-sm" onclick="menu_mod(#{key}, -1)"><div class="glyphicon glyphicon-minus"></div></a>
 
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="affix basket-container">
         <div class="padding">
           <h3>Your Order
@@ -40,10 +40,12 @@
             <thead>
               <tr>
                 <th>Item
+                <th>Quantity
                 <th>Total
             <tbody id="visual-basket">
             <tfoot>
               <tr>
                 <th>Total
+                <th>
                 <th id="basketTotal">0.00
           <a href="@{OrderNewR}" class="btn btn-green">Order Now

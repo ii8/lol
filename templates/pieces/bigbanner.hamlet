@@ -1,0 +1,7 @@
+<div class="container main-container banner">
+  <div class="col-md-7 text-container">
+    <div class="text">
+      <h3>Mixed Seafood Chow Mein
+      <p>A tasty noodle dish made from lobster, king prawn and octupus. Very nice, can recommend.
+  <div class="col-md-5">
+    <img src="@{local domain ["img", "food.png"]}" class="image-responsive" alt="Mixed Seafood Chow Mein">

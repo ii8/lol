@@ -46,6 +46,9 @@ renderPiece' ps key template =
         let text = getData ps key "text"
         let cssClass = "scrolling-text-" <> (show $ fromSqlKey key)
         $(widgetFile "pieces/scroll")
+    "bigbanner" -> do
+        domain <- handlerToWidget $ deploymentDomain <$> getDeployment
+        $(widgetFile "pieces/bigbanner")
     "imgmenu" -> do
         domain <- handlerToWidget $ getDomain
         (_, raw) <- handlerToWidget $ queryData key "links"

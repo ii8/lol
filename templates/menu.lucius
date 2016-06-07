@@ -9,21 +9,21 @@
 @media (min-width: 979px) {
   .basket-container.affix-top {
     position: static;
-  	width:228px;
+  	width:313px;
   }
 
   .basket-container.affix {
     position: fixed;
-    width:228px;
+    width:313px;
   }
 }
 
 @media (min-width: 1200px) {
   .basket-container.addix-top {
-    width: 263px;
+    width: 380px;
   }
   .basket-container.affix{
-    width: 263px;
+    width: 380px;
   }
 }
 
