@@ -15,7 +15,7 @@ queryProduct key = do
         ((Entity _ p):_) -> Just p
         [] -> Nothing
 
-queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool, Maybe (Value Text))]
+queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool, Value (Maybe Text))]
 queryProudctList = do
     d <- getDeploymentId
     runDB $ select $ from $ \(p `InnerJoin` c `LeftOuterJoin` pt `LeftOuterJoin` t) -> do
@@ -23,14 +23,14 @@ queryProudctList = do
         on $ just( p ^. ProductId) ==. pt ?. ProductTagProduct
         on $ c ^. CategoryId ==. p ^. ProductCategory
         where_ (c ^. CategoryDeployment ==. (val d))
-        return
-            ( p ^. ProductId
-            , p ^. ProductName
-            , p ^. ProductPrice
-            , c ^. CategoryName
-            , p ^. ProductAvailable
-            , t ?. TagName
-            )
+        return $ foldr categorise [] rows
+      where
+        categorise (Value key, Value product, Value price, Value category, Value available, Value name) (x@(current, sublist):xs) =
+            if cat == current
+                then (cat, (fromSqlKey key, name, price):sublist):xs
+                else (cat, [(fromSqlKey key, name, price)]):x:xs
+        categorise (Value key, Value product, Value price, Value category, Value available, Value name) [] =
+            [(fromSqlKey key, product, price, category, available, [name])]
 
 queryCategoryList :: Handler (OptionList CategoryId)
 queryCategoryList = do

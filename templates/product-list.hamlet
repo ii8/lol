@@ -9,12 +9,17 @@
           <th>Name
           <th>Price
           <th>Category
+          <th>Tags
           <th>Available
       <tbody>
-        $forall (Value key, Value product, Value price, Value category, Value available, Value name) <- ps
+        $forall (Value key, Value product, Value price, Value category, Value available, Value maybeName) <- ps
           <tr>
             <td><a href="@{ProductEditR key}">#{product}</a>
             <td>#{price}
             <td>#{category}
+            $maybe name <- maybeName
+              <td>#{name}
+            $nothing
+              <td>
             <td>
               <input type="checkbox" value="#{fromSqlKey key}" :available:checked>
