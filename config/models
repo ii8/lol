@@ -56,6 +56,12 @@ Product
     description Text
     price Money
     available Bool
+ProductTag
+    product ProductId
+    tag TagId
+Tag
+    name Text
+    image Text
 Category
     deployment DeploymentId
     name Text

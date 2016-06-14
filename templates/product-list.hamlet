@@ -11,7 +11,7 @@
           <th>Category
           <th>Available
       <tbody>
-        $forall (Value key, Value product, Value price, Value category, Value available) <- ps
+        $forall (Value key, Value product, Value price, Value category, Value available, Value name) <- ps
           <tr>
             <td><a href="@{ProductEditR key}">#{product}</a>
             <td>#{price}

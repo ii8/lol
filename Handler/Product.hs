@@ -15,11 +15,13 @@ queryProduct key = do
         ((Entity _ p):_) -> Just p
         [] -> Nothing
 
-queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool)]
+queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool, Maybe (Value Text))]
 queryProudctList = do
     d <- getDeploymentId
-    runDB $ select $ from $ \(c `InnerJoin` p) -> do
-        on (c ^. CategoryId ==. p ^. ProductCategory)
+    runDB $ select $ from $ \(p `InnerJoin` c `LeftOuterJoin` pt `LeftOuterJoin` t) -> do
+        on $ t ?. TagId ==. pt ?. ProductTagTag
+        on $ just( p ^. ProductId) ==. pt ?. ProductTagProduct
+        on $ c ^. CategoryId ==. p ^. ProductCategory
         where_ (c ^. CategoryDeployment ==. (val d))
         return
             ( p ^. ProductId
@@ -27,6 +29,7 @@ queryProudctList = do
             , p ^. ProductPrice
             , c ^. CategoryName
             , p ^. ProductAvailable
+            , t ?. TagName
             )
 
 queryCategoryList :: Handler (OptionList CategoryId)
