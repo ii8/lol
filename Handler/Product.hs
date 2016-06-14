@@ -15,22 +15,36 @@ queryProduct key = do
         ((Entity _ p):_) -> Just p
         [] -> Nothing
 
-queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool, Maybe (Value Text))]
+queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool, [Maybe (Value Text)])]
 queryProudctList = do
-    d <- getDeploymentId
-    runDB $ select $ from $ \(p `InnerJoin` c `LeftOuterJoin` pt `LeftOuterJoin` t) -> do
-        on $ t ?. TagId ==. pt ?. ProductTagTag
-        on $ just( p ^. ProductId) ==. pt ?. ProductTagProduct
-        on $ c ^. CategoryId ==. p ^. ProductCategory
-        where_ (c ^. CategoryDeployment ==. (val d))
-        return
-            ( p ^. ProductId
-            , p ^. ProductName
-            , p ^. ProductPrice
-            , c ^. CategoryName
-            , p ^. ProductAvailable
-            , t ?. TagName
-            )
+  d <- getDeploymentId
+  derp <- runDB $ select $ from $ \(p `InnerJoin` c `LeftOuterJoin` pt `LeftOuterJoin` t) -> do
+      on $ t ?. TagId ==. pt ?. ProductTagTag
+      on $ just( p ^. ProductId) ==. pt ?. ProductTagProduct
+      on $ c ^. CategoryId ==. p ^. ProductCategory
+      where_ (c ^. CategoryDeployment ==. (val d))
+      return ( p ^. ProductId
+          , t ?. TagName
+          , p ^. ProductName
+          , p ^. ProductPrice
+          , c ^. CategoryName
+          , p ^. ProductAvailable
+          )
+  return $ foldr group [] derp
+  where
+     myfst :: (Value ProductId, Value Text, Value Money, Value Text, Value Bool, Maybe (Value Text)) -> ProductId
+     myfst = (Value x,_,_,_,_,_) = x
+
+     my6th :: (Value ProductId, Value Text, Value Money, Value Text, Value Bool, Maybe (Value Text)) -> Maybe Text
+     my6th = (_,_,_,_,_, x) = fmap unValue x
+
+     group stuff [] = (last, tag, product, price, category, available, [tag])
+
+     group stuff all@((last, tag, product, price, category, available):r) =
+         if myfst stuff == last
+             then (last, (my6th stuff):tag):r
+             else (last, [tag]):all
+
 
 queryCategoryList :: Handler (OptionList CategoryId)
 queryCategoryList = do
