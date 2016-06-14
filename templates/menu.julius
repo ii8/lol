@@ -86,7 +86,7 @@ $(document).ready(function()
         var isPositionFixed = ($el.css('position') == 'fixed');
 
         if ($(this).scrollTop() > 200 && !isPositionFixed){
-            $('.fixed-element').css({'position': 'fixed', 'top': '10px'});
+            $('.fixed-element').css({'position': 'fixed', 'top': '35px'});
         }
         if ($(this).scrollTop() < 200 && isPositionFixed){
             $('.fixed-element').css({'position': 'static', 'top': '10px'});
