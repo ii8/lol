@@ -1,0 +1,1 @@
+<img src=@{local domain ["img", image]} class=image-responsive>

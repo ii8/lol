@@ -14,36 +14,61 @@ queryProduct key = do
     return $ case ps of
         ((Entity _ p):_) -> Just p
         [] -> Nothing
-
-queryProudctList :: Handler [(Value ProductId, Value Text, Value Money, Value Text, Value Bool, [Maybe (Value Text)])]
+{-}
+queryProudctList :: Handler [(Text, [(ProductId, Text, Money, Bool, [Maybe Text])])]
 queryProudctList = do
-  d <- getDeploymentId
-  derp <- runDB $ select $ from $ \(p `InnerJoin` c `LeftOuterJoin` pt `LeftOuterJoin` t) -> do
-      on $ t ?. TagId ==. pt ?. ProductTagTag
-      on $ just( p ^. ProductId) ==. pt ?. ProductTagProduct
-      on $ c ^. CategoryId ==. p ^. ProductCategory
-      where_ (c ^. CategoryDeployment ==. (val d))
-      return ( p ^. ProductId
-          , t ?. TagName
-          , p ^. ProductName
-          , p ^. ProductPrice
-          , c ^. CategoryName
-          , p ^. ProductAvailable
-          )
-  return $ foldr group [] derp
+    d <- getDeploymentId
+    derp <- runDB $ select $ from $ \(p `InnerJoin` c `LeftOuterJoin` pt `LeftOuterJoin` t) -> do
+        on $ t ?. TagId ==. pt ?. ProductTagTag
+        on $ just( p ^. ProductId) ==. pt ?. ProductTagProduct
+        on $ c ^. CategoryId ==. p ^. ProductCategory
+        where_ (c ^. CategoryDeployment ==. (val d))
+        orderBy [asc (p ^. ProductId)]
+        return ( p ^. ProductId
+            , t ?. TagName
+            , p ^. ProductName
+            , p ^. ProductPrice
+            , c ^. CategoryName
+            , p ^. ProductAvailable
+            )
+    return $ foldr (groupProducts . groupTags) [] derp -- now implement both
   where
-     myfst :: (Value ProductId, Value Text, Value Money, Value Text, Value Bool, Maybe (Value Text)) -> ProductId
-     myfst = (Value x,_,_,_,_,_) = x
 
-     my6th :: (Value ProductId, Value Text, Value Money, Value Text, Value Bool, Maybe (Value Text)) -> Maybe Text
-     my6th = (_,_,_,_,_, x) = fmap unValue x
+    groupTags (Value pid, Value tag, Value name, Value price, Value category, Value available) [] = [(pid, name, price, category, available, [tag])]
+    groupTags (Value pid, Value tag, Value n, Value p, Value c, Value a) allProduct@((lastProduct, _, _, _, _, tags):r) =
+        if pid == lastProduct
+            then (pid, n, p, c, a, tag:tags):r
+            else (pid, n, p, c, a, [tag]):allProduct
 
-     group stuff [] = (last, tag, product, price, category, available, [tag])
-
-     group stuff all@((last, tag, product, price, category, available):r) =
-         if myfst stuff == last
-             then (last, (my6th stuff):tag):r
-             else (last, [tag]):all
+    groupProducts (pid, name, price, category, available, [tag]) [] = [(category, [(pid, name, price, available, [tag])])]
+    groupProducts (pid, n, p, c, a, [tag]) allCategory@((lastCategory, lastProduct):r) =
+        if c == lastCategory
+            then (c, (pid, n, p, a, tag):lastProduct):r
+            else (c, [(pid, n, p, a, [tag])]):allCategory
+            -}
+queryProudctList :: Handler [(ProductId, Text, Money, Text, Bool, [Maybe Text])]
+queryProudctList = do
+    d <- getDeploymentId
+    derp <- runDB $ select $ from $ \(p `InnerJoin` c `LeftOuterJoin` pt `LeftOuterJoin` t) -> do -- line 21
+        on $ t ?. TagId ==. pt ?. ProductTagTag
+        on $ just( p ^. ProductId) ==. pt ?. ProductTagProduct
+        on $ c ^. CategoryId ==. p ^. ProductCategory
+        where_ (c ^. CategoryDeployment ==. (val d))
+        orderBy [asc (p ^. ProductId)]
+        return ( p ^. ProductId
+            , t ?. TagName
+            , p ^. ProductName
+            , p ^. ProductPrice
+            , c ^. CategoryName
+            , p ^. ProductAvailable
+            )
+    return $ foldr groupProduct [] derp
+  where
+    groupProduct (Value pid, Value tag, Value name, Value price, Value category, Value available) [] = [(pid, name, price, category, available, [tag])]
+    groupProduct (Value pid, Value tag, Value n, Value p, Value c, Value a) allProduct@((lastProduct, _, _, _, _, tags):r) =
+        if pid == lastProduct
+            then (pid, n, p, c, a, tag:tags):r
+            else (pid, n, p, c, a, [tag]):allProduct
 
 
 queryCategoryList :: Handler (OptionList CategoryId)

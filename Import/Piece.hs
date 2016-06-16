@@ -49,6 +49,10 @@ renderPiece' ps key template =
     "bigbanner" -> do
         domain <- handlerToWidget $ deploymentDomain <$> getDeployment
         $(widgetFile "pieces/bigbanner")
+    "image" -> do
+        domain <- handlerToWidget $ deploymentDomain <$> getDeployment
+        (_, image) <- handlerToWidget $ queryData key "image"
+        $(widgetFile "pieces/image")
     "imgmenu" -> do
         domain <- handlerToWidget $ getDomain
         (_, raw) <- handlerToWidget $ queryData key "links"

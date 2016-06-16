@@ -27,20 +27,6 @@ wrap w "navbar" = do
         mhome' = wrapKey "home" wd
         mhome = fmap (\(_, t, v) -> renderData t v) mhome'
     $(widgetFile "wrappers/navbar")
-wrap w "amazekebab" = do
-    maid <- handlerToWidget maybeAuthId
-    ms <- getMessages
-    manager <- handlerToWidget $ checkLevel Manager
-    domain <- handlerToWidget getDomain
-    r <- handlerToWidget getCurrentRoute
-    wd <- handlerToWidget wrapData
-    let isHome = case r of
-            Just HomeR -> True
-            Just (CustomR "home") -> True
-            _ -> False
-        mhome' = wrapKey "home" wd
-        mhome = fmap (\(_, t, v) -> renderData t v) mhome'
-    $(widgetFile "wrappers/amazekebab")
 wrap w _ = getMessages >>= (\ms -> $(widgetFile "wrappers/default-layout"))
 
 wrapData :: Handler [(Value Text, Value PieceDataType, Value Text)]
