@@ -1,5 +1,5 @@
 <div class="container main-container">
-  <div class="col-md-12">
-    <h1>Login
-    <div class="col-md-4 col-md-offset-4 login">
+  <div class="col-md-4 col-md-offset-4">
+    <div class="login">
+      <h1>Login
       ^{box}

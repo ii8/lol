@@ -3,7 +3,8 @@
     <h1>Menu
 
   $if null rows
-    <p>No products
+    <div class="col-md-12">
+      <p>No products
   $else
     <div class="col-md-8">
       <div class="list-group menu">
