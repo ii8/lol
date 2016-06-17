@@ -14,6 +14,7 @@ queryProduct key = do
     return $ case ps of
         ((Entity _ p):_) -> Just p
         [] -> Nothing
+
 {-}
 queryProudctList :: Handler [(Text, [(ProductId, Text, Money, Bool, [Maybe Text])])]
 queryProudctList = do
@@ -69,7 +70,6 @@ queryProudctList = do
         if pid == lastProduct
             then (pid, n, p, c, a, tag:tags):r
             else (pid, n, p, c, a, [tag]):allProduct
-
 
 queryCategoryList :: Handler (OptionList CategoryId)
 queryCategoryList = do

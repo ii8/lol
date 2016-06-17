@@ -9,6 +9,7 @@
           <th>Name
           <th>Price
           <th>Category
+          <th>Tags
           <th>Available
       <tbody>
         $forall (key, product, price, category, available, [name]) <- ps
